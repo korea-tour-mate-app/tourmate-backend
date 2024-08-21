@@ -30,7 +30,7 @@ public class Member extends BaseTimeEntity {
     private String email;
 
     @Column(nullable = false, updatable = false)
-    private LocalDate createdAt;
+    private LocalDate createdAt = LocalDate.now(); // 현재 날짜 할당되게 함
 
     @OneToMany(mappedBy = "member")
     private List<Like> likes;
