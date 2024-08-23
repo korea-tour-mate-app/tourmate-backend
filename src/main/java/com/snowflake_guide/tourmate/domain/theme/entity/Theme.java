@@ -18,7 +18,7 @@ public class Theme extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long themeId;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String placeTheme; // 테마 이름
 
     @OneToMany(mappedBy = "theme")
