@@ -1,6 +1,7 @@
 package com.snowflake_guide.tourmate.domain.review.service;
 
 import com.snowflake_guide.tourmate.domain.my_place.repository.MyPlaceRepository;
+import com.snowflake_guide.tourmate.domain.review.dto.PlaceReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewRequestDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.entity.Review;
@@ -91,7 +92,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponseDto> getReviewsByPlaceId(Long placeId, Long memberId) {
+    public PlaceReviewResponseDto getReviewsByPlaceId(Long placeId, Long memberId) {
         // Place ID에 해당하는 VisitedPlace 목록을 가져옴
         List<VisitedPlace> visitedPlaces = visitedPlaceRepository.findByPlace_PlaceId(placeId);
 
@@ -101,9 +102,12 @@ public class ReviewService {
                 .anyMatch(visitedPlace -> visitedPlace.getMyPlace().getMember().getMemberId().equals(memberId) && visitedPlace.getMyPlace().getVisited());
 
         // 리뷰 리스트 생성
-        return visitedPlaces.stream()
+        List<ReviewResponseDto> reviewList = visitedPlaces.stream()
                 .flatMap(visitedPlace -> visitedPlace.getReviews().stream())
-                .map(review -> new ReviewResponseDto(review, isVisited))
-                .collect(Collectors.toList());
+                .map(ReviewResponseDto::new)
+                .toList();
+
+        // 리뷰 리스트와 방문 여부를 포함한 응답 생성
+        return new PlaceReviewResponseDto(reviewList, isVisited);
     }
 }

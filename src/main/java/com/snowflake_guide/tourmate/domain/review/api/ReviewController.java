@@ -2,6 +2,7 @@ package com.snowflake_guide.tourmate.domain.review.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.snowflake_guide.tourmate.domain.review.dto.PlaceReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewRequestDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ValidationErrorResponse;
@@ -97,19 +98,20 @@ public class ReviewController {
         }
     }
 
-    @Operation(summary = "리뷰 조회", description = "지정된 장소에 대한 리뷰를 조회하고, 현재 사용자가 방문한 장소인지 확인합니다.")
-    @GetMapping("/{placeId}/review")
+    @Operation(summary = "특정 장소에 대한 리뷰 조회", description = "특정 장소에 대한 리뷰를 조회하고, 현재 사용자가 방문한 장소인지 확인합니다.")
+    @GetMapping("/place/{placeId}/reviews")
     public ResponseEntity<?> getReviewsByPlaceId(
             @Parameter(description = "장소 ID", example = "1") @PathVariable("placeId") Long placeId,
-            @RequestParam("memberId") Long memberId) {
+            @Parameter(description = "회원 ID", example = "1") @RequestParam("memberId") Long memberId) {
 
         try {
-            List<ReviewResponseDto> reviews = reviewService.getReviewsByPlaceId(placeId, memberId);
-            return ResponseEntity.ok(reviews);
+            PlaceReviewResponseDto response = reviewService.getReviewsByPlaceId(placeId, memberId);
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.error("리뷰 조회 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "place_not_found", "message", e.getMessage()));
+                    .body(Map.of("error", "reviews_not_found", "message", e.getMessage()));
         }
     }
+
 }
