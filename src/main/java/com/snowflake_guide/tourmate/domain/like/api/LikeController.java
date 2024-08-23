@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "Review API", description = "테마별 리뷰를 조회, 등록, 삭제하는 API")
+@Tag(name = "Like API", description = "사용자가 좋아요한 장소를 조회하는 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
