@@ -64,4 +64,25 @@ public class ReviewService {
 
         reviewRepository.save(review);
     }
+
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
+
+        try {
+            deleteReviewImages(review);
+        } catch (RuntimeException e) {
+            log.error("리뷰 이미지 삭제 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("리뷰 이미지 삭제 중 오류가 발생했습니다.", e);
+        }
+
+        reviewRepository.delete(review);
+    }
+    // S3에서 이미지 삭제 진행
+    private void deleteReviewImages(Review review) {
+        if (review.getReviewUrl1() != null) s3Service.delete(review.getReviewUrl1());
+        if (review.getReviewUrl2() != null) s3Service.delete(review.getReviewUrl2());
+        if (review.getReviewUrl3() != null) s3Service.delete(review.getReviewUrl3());
+    }
 }

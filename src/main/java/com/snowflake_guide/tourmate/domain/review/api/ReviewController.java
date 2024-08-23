@@ -76,4 +76,23 @@ public class ReviewController {
                     .body(Map.of("error", "image_upload_error", "message", "리뷰 이미지 업로드 중 오류가 발생했습니다.", "details", e.getMessage()));
         }
     }
+
+    @Operation(summary = "리뷰 삭제", description = "지정된 리뷰를 삭제합니다.")
+    @DeleteMapping("/review/{reviewId}")
+    public ResponseEntity<?> deleteReview(
+            @Parameter(description = "리뷰 ID", example = "1") @PathVariable("reviewId") Long reviewId) {
+        try {
+            // TODO 본인의 리뷰인 경우에만 삭제 진행
+            reviewService.deleteReview(reviewId);
+            return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            log.error("리뷰 삭제 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "review_not_found", "message", e.getMessage()));
+        } catch (RuntimeException e) {
+            log.error("리뷰 삭제 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "review_delete_error", "message", "리뷰 삭제 중 오류가 발생했습니다.", "details", e.getMessage()));
+        }
+    }
 }
