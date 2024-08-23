@@ -3,6 +3,7 @@ package com.snowflake_guide.tourmate.domain.review.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewRequestDto;
+import com.snowflake_guide.tourmate.domain.review.dto.ReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ValidationErrorResponse;
 import com.snowflake_guide.tourmate.domain.review.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,6 +94,22 @@ public class ReviewController {
             log.error("리뷰 삭제 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "review_delete_error", "message", "리뷰 삭제 중 오류가 발생했습니다.", "details", e.getMessage()));
+        }
+    }
+
+    @Operation(summary = "리뷰 조회", description = "지정된 장소에 대한 리뷰를 조회하고, 현재 사용자가 방문한 장소인지 확인합니다.")
+    @GetMapping("/{placeId}/review")
+    public ResponseEntity<?> getReviewsByPlaceId(
+            @Parameter(description = "장소 ID", example = "1") @PathVariable("placeId") Long placeId,
+            @RequestParam("memberId") Long memberId) {
+
+        try {
+            List<ReviewResponseDto> reviews = reviewService.getReviewsByPlaceId(placeId, memberId);
+            return ResponseEntity.ok(reviews);
+        } catch (IllegalArgumentException e) {
+            log.error("리뷰 조회 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "place_not_found", "message", e.getMessage()));
         }
     }
 }

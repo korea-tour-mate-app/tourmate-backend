@@ -1,6 +1,8 @@
 package com.snowflake_guide.tourmate.domain.review.service;
 
+import com.snowflake_guide.tourmate.domain.my_place.repository.MyPlaceRepository;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewRequestDto;
+import com.snowflake_guide.tourmate.domain.review.dto.ReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.entity.Review;
 import com.snowflake_guide.tourmate.domain.review.repository.ReviewRepository;
 import com.snowflake_guide.tourmate.domain.visited_place.entity.VisitedPlace;
@@ -14,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,6 +25,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final VisitedPlaceRepository visitedPlaceRepository;
+    private final MyPlaceRepository myPlaceRepository;
     private final S3Service s3Service;
 
     public void createReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) {
@@ -84,5 +88,22 @@ public class ReviewService {
         if (review.getReviewUrl1() != null) s3Service.delete(review.getReviewUrl1());
         if (review.getReviewUrl2() != null) s3Service.delete(review.getReviewUrl2());
         if (review.getReviewUrl3() != null) s3Service.delete(review.getReviewUrl3());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getReviewsByPlaceId(Long placeId, Long memberId) {
+        // Place ID에 해당하는 VisitedPlace 목록을 가져옴
+        List<VisitedPlace> visitedPlaces = visitedPlaceRepository.findByPlace_PlaceId(placeId);
+
+        // VisitedPlace(방문한 장소)가 있는지 확인 (VisitedPlace -> MyPlace -> Member 경로를 따라 확인)
+        // MyPlace의 값이 True인지 확인
+        boolean isVisited = visitedPlaces.stream()
+                .anyMatch(visitedPlace -> visitedPlace.getMyPlace().getMember().getMemberId().equals(memberId) && visitedPlace.getMyPlace().getVisited());
+
+        // 리뷰 리스트 생성
+        return visitedPlaces.stream()
+                .flatMap(visitedPlace -> visitedPlace.getReviews().stream())
+                .map(review -> new ReviewResponseDto(review, isVisited))
+                .collect(Collectors.toList());
     }
 }
