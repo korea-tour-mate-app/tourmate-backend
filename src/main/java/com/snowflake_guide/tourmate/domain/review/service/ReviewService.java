@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,16 +24,21 @@ public class ReviewService {
     private final VisitedPlaceRepository visitedPlaceRepository;
     private final S3Service s3Service;
 
-    public void createReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) throws IOException {
+    public void createReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) {
         // S3에 이미지 업로드 (트랜잭션 외부에서 처리)
         List<String> imageUrls = new ArrayList<>();
         if (reviewImages != null) {
-            for (MultipartFile image : reviewImages) {
-                if (!image.isEmpty()) {
-                    String imageUrl = s3Service.upload("reviews", image.getOriginalFilename(), image); // reviews 폴더에 저장
-                    imageUrls.add(imageUrl);
+            try {
+                for (MultipartFile image : reviewImages) {
+                    if (!image.isEmpty()) {
+                        String imageUrl = s3Service.upload("reviews", image.getOriginalFilename(), image); // reviews 폴더에 저장
+                        imageUrls.add(imageUrl);
+                    }
+                    if (imageUrls.size() == 3) break;  // 최대 3장까지 업로드
                 }
-                if (imageUrls.size() == 3) break;  // 최대 3장까지 업로드
+            } catch (IOException e) {
+                log.error("리뷰 이미지 업로드 중 오류 발생: {}", e.getMessage());
+                throw new RuntimeException("리뷰 이미지 업로드 중 오류가 발생했습니다.", e); // 이 예외는 컨트롤러에서 처리하도록 던집니다.
             }
         }
 
@@ -45,11 +49,8 @@ public class ReviewService {
     @Transactional
     public void saveReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, List<String> imageUrls) {
         // VisitedPlace 존재 여부 확인
-        Optional<VisitedPlace> visitedPlaceOpt = visitedPlaceRepository.findById(visitedPlaceId);
-        if (visitedPlaceOpt.isEmpty()) {
-            throw new IllegalArgumentException("해당 방문한 장소가 존재하지 않습니다.");
-        }
-        VisitedPlace visitedPlace = visitedPlaceOpt.get();
+        VisitedPlace visitedPlace = visitedPlaceRepository.findById(visitedPlaceId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 방문한 장소가 존재하지 않습니다."));
 
         // Review 엔티티 생성 및 저장
         Review review = Review.builder()
