@@ -6,6 +6,7 @@ import com.snowflake_guide.tourmate.domain.like.repository.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class LikeService {
     private final LikeRepository likeRepository;
 
+    @Transactional(readOnly = true)
     public List<LikeListResponseDto> getLikedPlaces(Long memberId, Long themeId) {
         List<Like> likes;
 
