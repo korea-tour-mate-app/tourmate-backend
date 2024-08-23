@@ -25,8 +25,7 @@ public class Review extends BaseTimeEntity {
     private String reviewDec; // 리뷰 내용
 
     @Column(nullable = false)
-    private Float rate;
-
+    private Float rate; // 평점 (1~5, 0.5간격)
     private String reviewUrl1;
     private String reviewUrl2;
     private String reviewUrl3;
