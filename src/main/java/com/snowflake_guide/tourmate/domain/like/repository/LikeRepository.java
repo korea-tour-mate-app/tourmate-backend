@@ -1,14 +1,13 @@
 package com.snowflake_guide.tourmate.domain.like.repository;
 
 import com.snowflake_guide.tourmate.domain.like.entity.Like;
-import com.snowflake_guide.tourmate.domain.review.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface LikeRepository extends JpaRepository<Review, Long> {
+public interface LikeRepository extends JpaRepository<Like, Long> {
     // 특정 회원이 좋아요한 모든 장소를 조회
     List<Like> findByMember_MemberId(Long memberId);
 
