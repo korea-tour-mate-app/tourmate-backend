@@ -6,11 +6,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +27,14 @@ public class LikeController {
         // TODO 로그인 멤버 추출로 변경
         List<LikeListResponseDto> likedPlaces = likeService.getLikedPlaces(memberId, themeId);
         return ResponseEntity.ok(likedPlaces);
+    }
+
+    @Operation(summary = "좋아요 토글", description = "특정 장소에 대한 좋아요 상태를 토글합니다.")
+    @PostMapping("/{placeId}")
+    public ResponseEntity<String> toggleLike(@RequestParam Long memberId, @PathVariable("placeId") Long placeId) {
+
+        // TODO 로그인 멤버 추출로 변경
+        likeService.toggleLike(memberId, placeId);
+        return ResponseEntity.ok("좋아요가 성공적으로 등록/취소되었습니다.");
     }
 }

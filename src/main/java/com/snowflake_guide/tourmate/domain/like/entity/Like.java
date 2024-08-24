@@ -32,5 +32,10 @@ public class Like extends BaseTimeEntity {
 
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt = LocalDate.now(); // 생성일: 현재 날짜 할당되게 함
+
+    // 좋아요 상태를 토글하는 메서드
+    public void toggleLiked() {
+        this.liked = !this.liked;
+    }
 }
 
