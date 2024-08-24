@@ -1,6 +1,5 @@
 package com.snowflake_guide.tourmate.domain.review.service;
 
-import com.snowflake_guide.tourmate.domain.my_place.repository.MyPlaceRepository;
 import com.snowflake_guide.tourmate.domain.review.dto.PlaceReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewRequestDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewResponseDto;
@@ -17,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,7 +24,6 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final VisitedPlaceRepository visitedPlaceRepository;
-    private final MyPlaceRepository myPlaceRepository;
     private final S3Service s3Service;
 
     public void createReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) {
@@ -38,6 +35,7 @@ public class ReviewService {
                     if (!image.isEmpty()) {
                         String imageUrl = s3Service.upload("reviews", image.getOriginalFilename(), image); // reviews 폴더에 저장
                         imageUrls.add(imageUrl);
+                        log.info("리뷰 이미지 업로드 성공: {}", imageUrl);
                     }
                     if (imageUrls.size() == 3) break;  // 최대 3장까지 업로드
                 }
@@ -56,6 +54,7 @@ public class ReviewService {
         // VisitedPlace 존재 여부 확인
         VisitedPlace visitedPlace = visitedPlaceRepository.findById(visitedPlaceId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방문한 장소가 존재하지 않습니다."));
+        log.info("리뷰를 저장할 방문지 확인: 방문지 ID = {}", visitedPlaceId);
 
         // Review 엔티티 생성 및 저장
         Review review = Review.builder()
@@ -68,6 +67,7 @@ public class ReviewService {
                 .build();
 
         reviewRepository.save(review);
+        log.info("리뷰가 성공적으로 저장되었습니다: 리뷰 ID = {}, 방문지 ID = {}", review.getReviewId(), visitedPlaceId);
     }
 
     @Transactional
@@ -77,13 +77,16 @@ public class ReviewService {
 
         try {
             deleteReviewImages(review);
+            log.info("리뷰 이미지가 성공적으로 삭제되었습니다: 리뷰 ID = {}", reviewId);
         } catch (RuntimeException e) {
             log.error("리뷰 이미지 삭제 중 오류 발생: {}", e.getMessage());
             throw new RuntimeException("리뷰 이미지 삭제 중 오류가 발생했습니다.", e);
         }
 
         reviewRepository.delete(review);
+        log.info("리뷰가 성공적으로 삭제되었습니다: 리뷰 ID = {}", reviewId);
     }
+
     // S3에서 이미지 삭제 진행
     private void deleteReviewImages(Review review) {
         if (review.getReviewUrl1() != null) s3Service.delete(review.getReviewUrl1());
@@ -96,17 +99,17 @@ public class ReviewService {
         // Place ID에 해당하는 VisitedPlace 목록을 가져옴
         List<VisitedPlace> visitedPlaces = visitedPlaceRepository.findByPlace_PlaceId(placeId);
 
-        // VisitedPlace(방문한 장소)가 있는지 확인 (VisitedPlace -> MyPlace -> Member 경로를 따라 확인)
-        // MyPlace의 값이 True인지 확인
+        // VisitedPlace가 있는지 확인하고, 해당 VisitedPlace가 현재 회원(memberId)과 일치하는지 확인
         boolean isVisited = visitedPlaces.stream()
-                .anyMatch(visitedPlace -> visitedPlace.getMyPlace().getMember().getMemberId().equals(memberId) && visitedPlace.getMyPlace().getVisited());
+                .anyMatch(visitedPlace -> visitedPlace.getMember().getMemberId().equals(memberId) && visitedPlace.getVisited());
+        log.info("회원의 방문 여부 확인: 방문지 ID = {}, 방문 여부 = {}", placeId, isVisited);
 
         // 리뷰 리스트 생성
         List<ReviewResponseDto> reviewList = visitedPlaces.stream()
                 .flatMap(visitedPlace -> visitedPlace.getReviews().stream())
                 .map(ReviewResponseDto::new)
                 .toList();
-
+        log.info("리뷰 조회 완료: 장소 ID = {}, 리뷰 수 = {}", placeId, reviewList.size());
         // 리뷰 리스트와 방문 여부를 포함한 응답 생성
         return new PlaceReviewResponseDto(reviewList, isVisited);
     }
