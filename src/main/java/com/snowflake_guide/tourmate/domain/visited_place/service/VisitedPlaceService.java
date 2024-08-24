@@ -63,7 +63,9 @@ public class VisitedPlaceService {
             // 이미 존재하는 VisitedPlace의 visited 상태를 토글
             VisitedPlace visitedPlace = visitedPlaceOpt.get();
             visitedPlace.toggleVisited(); // 상태 토글
-            visitedPlaceRepository.save(visitedPlace);
+            visitedPlaceRepository.save(visitedPlace); // 명시적으로 저장 (선택사항)
+            log.info("회원 ID: {}와 장소 ID: {}에 대한 방문 상태가 변경되었습니다.", memberId, placeId);
+
         } else {
             // 새로운 VisitedPlace 생성
             VisitedPlace visitedPlace = VisitedPlace.builder()
@@ -72,6 +74,7 @@ public class VisitedPlaceService {
                     .visited(true) // 초기값을 true로 설정
                     .build();
             visitedPlaceRepository.save(visitedPlace);
+            log.info("회원 ID: {}와 장소 ID: {}에 대한 새로운 방문장소가 생성되었습니다.", memberId, placeId);
         }
     }
 }

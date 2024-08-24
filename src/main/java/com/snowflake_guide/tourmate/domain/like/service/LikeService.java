@@ -62,9 +62,9 @@ public class LikeService {
 
         if (existingLikeOpt.isPresent()) {
             Like existingLike = existingLikeOpt.get();
-            // 좋아요 상태를 토글
             existingLike.toggleLiked(); // 좋아요 상태를 토글
-            likeRepository.save(existingLike);
+            likeRepository.save(existingLike); // 명시적으로 저장 (선택사항)
+            log.info("회원 ID: {}와 장소 ID: {}에 대한 좋아요 상태가 변경되었습니다.", memberId, placeId);
         } else {
             // 새로운 좋아요 생성
             Like newLike = Like.builder()
@@ -73,6 +73,7 @@ public class LikeService {
                     .liked(true)
                     .build();
             likeRepository.save(newLike);
+            log.info("회원 ID: {}와 장소 ID: {}에 대한 새로운 좋아요가 생성되었습니다.", memberId, placeId);
         }
     }
 }
