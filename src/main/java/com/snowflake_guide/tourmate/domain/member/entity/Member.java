@@ -1,7 +1,7 @@
 package com.snowflake_guide.tourmate.domain.member.entity;
 
 import com.snowflake_guide.tourmate.domain.like.entity.Like;
-import com.snowflake_guide.tourmate.domain.my_place.entity.MyPlace;
+import com.snowflake_guide.tourmate.domain.visited_place.entity.VisitedPlace;
 import com.snowflake_guide.tourmate.global.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,5 +36,5 @@ public class Member extends BaseTimeEntity {
     private List<Like> likes;
 
     @OneToMany(mappedBy = "member")
-    private List<MyPlace> myPlaces;
+    private List<VisitedPlace> visitedPlaces;
 }
