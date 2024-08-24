@@ -27,4 +27,8 @@ public class MyPlace extends BaseTimeEntity { // 내 장소 리스트
 
     @Column(nullable = false)
     private LocalDate createdAt = LocalDate.now(); // 생성일: 현재 날짜 할당되게 함
+
+    public void toggleVisited(){
+        this.visited = !this.visited;
+    }
 }

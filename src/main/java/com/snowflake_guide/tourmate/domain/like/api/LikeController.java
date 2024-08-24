@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Like API", description = "사용자가 좋아요한 장소를 조회하는 API")
+@Tag(name = "Like API", description = "사용자가 좋아요한 장소를 조회하고 토글하는 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
