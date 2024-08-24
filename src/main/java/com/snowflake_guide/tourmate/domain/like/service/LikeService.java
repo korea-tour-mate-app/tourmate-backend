@@ -31,10 +31,11 @@ public class LikeService {
         if (themeId != null) {
             // Member -> Like -> Place -> Theme
             // themeId가 제공된 경우, 해당 테마에 속하는 장소 중 좋아요한 것들만 필터링
-            likes = likeRepository.findByMember_MemberIdAndPlace_Theme_ThemeId(memberId, themeId);
+            // 좋아요한 것들: Like엔티티가 존재하면서 like 필드가 true인 경우
+            likes = likeRepository.findByMember_MemberIdAndPlace_Theme_ThemeIdAndLikedTrue(memberId, themeId);
         } else {
             // themeId가 제공되지 않은 경우, 모든 좋아요한 장소 반환
-            likes = likeRepository.findByMember_MemberId(memberId);
+            likes = likeRepository.findByMember_MemberIdAndLikedTrue(memberId);
         }
 
         return likes.stream()

@@ -35,6 +35,6 @@ public class LikeController {
 
         // TODO 로그인 멤버 추출로 변경
         likeService.toggleLike(memberId, placeId);
-        return ResponseEntity.ok("좋아요가 성공적으로 등록/취소되었습니다.");
+        return ResponseEntity.ok("좋아요가 성공적으로 토글되었습니다.");
     }
 }
