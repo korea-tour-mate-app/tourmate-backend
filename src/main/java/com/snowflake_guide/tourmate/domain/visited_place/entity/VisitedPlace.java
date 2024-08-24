@@ -33,7 +33,7 @@ public class VisitedPlace extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean visited; // 가본 유무
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDate createdAt = LocalDate.now(); // 생성일: 현재 날짜 할당되게 함
 
     @OneToMany(mappedBy = "visitedPlace")

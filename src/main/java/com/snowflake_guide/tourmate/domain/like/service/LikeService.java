@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -71,6 +72,7 @@ public class LikeService {
                     .member(member)
                     .place(place)
                     .liked(true)
+                    .createdAt(LocalDate.now()) // 명시적으로 설정
                     .build();
             likeRepository.save(newLike);
             log.info("회원 ID: {}와 장소 ID: {}에 대한 새로운 좋아요가 생성되었습니다.", memberId, placeId);
