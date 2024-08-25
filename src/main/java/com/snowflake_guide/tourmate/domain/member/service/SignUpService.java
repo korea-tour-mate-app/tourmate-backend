@@ -6,6 +6,7 @@ import com.snowflake_guide.tourmate.domain.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class SignUpService {
@@ -20,8 +21,10 @@ public class SignUpService {
     }
 
     public Member signUp(SignUpRequestDTO signUpRequestDTO) {
+        validatePassword(signUpRequestDTO.getPassword());
+
         Member member = new Member();
-        member.setName(signUpRequestDTO.getUsername());
+        member.setName(signUpRequestDTO.getName());
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signUpRequestDTO.getPassword());
@@ -30,6 +33,12 @@ public class SignUpService {
         member.setEmail(signUpRequestDTO.getEmail());
 
         return memberRepository.save(member);
+    }
+
+    private void validatePassword(String password) {
+        if (!StringUtils.hasText(password) || password.length() < 6) {
+            throw new IllegalArgumentException("비밀번호는 최소 6자리 이상이어야 합니다.");
+        }
     }
 
     public boolean existsByUsername(String username) {

@@ -22,10 +22,6 @@ public class SignUpController {
 
     @PostMapping
     public ResponseEntity<String> signUp(@Validated @RequestBody SignUpRequestDTO signUpRequestDTO) {
-        // 중복 확인
-        if (signUpService.existsByUsername(signUpRequestDTO.getUsername())) {
-            return new ResponseEntity<>("이미 존재하는 Username이 있습니다.", HttpStatus.BAD_REQUEST);
-        }
 
         if (signUpService.existsByEmail(signUpRequestDTO.getEmail())) {
             return new ResponseEntity<>("이미 존재하는 Email이 있습니다.", HttpStatus.BAD_REQUEST);
