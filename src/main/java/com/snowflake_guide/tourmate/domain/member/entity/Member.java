@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "member")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
