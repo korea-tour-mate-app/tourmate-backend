@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll() // Swagger UI와 API 문서에 대한 접근 허용
-                                .requestMatchers("/api/auth/signup","/api/auth/login", "/api/s3/test").permitAll() // /api/auth/signup URL에 대한 접근 허용
+                                .requestMatchers("/api/auth/signup","/api/auth/login", "/api/s3/test", "/api/place/{placeId}/reviews").permitAll() // /api/auth/signup URL에 대한 접근 허용
                                 .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
