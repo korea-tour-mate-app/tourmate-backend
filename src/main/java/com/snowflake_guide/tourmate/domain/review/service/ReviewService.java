@@ -1,5 +1,7 @@
 package com.snowflake_guide.tourmate.domain.review.service;
 
+import com.snowflake_guide.tourmate.domain.member.entity.Member;
+import com.snowflake_guide.tourmate.domain.member.repository.MemberRepository;
 import com.snowflake_guide.tourmate.domain.review.dto.PlaceReviewResponseDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewRequestDto;
 import com.snowflake_guide.tourmate.domain.review.dto.ReviewResponseDto;
@@ -25,8 +27,9 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final VisitedPlaceRepository visitedPlaceRepository;
     private final S3Service s3Service;
+    private final MemberRepository memberRepository;
 
-    public void createReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) {
+    public void createReview(String email, ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) {
         // S3에 이미지 업로드 (트랜잭션 외부에서 처리)
         List<String> imageUrls = new ArrayList<>();
         if (reviewImages != null) {
@@ -46,14 +49,23 @@ public class ReviewService {
         }
 
         // 리뷰 저장 트랜잭션 시작
-        saveReview(reviewRequestDto, visitedPlaceId, imageUrls);
+        saveReview(email, reviewRequestDto, visitedPlaceId, imageUrls);
     }
 
     @Transactional
-    public void saveReview(ReviewRequestDto reviewRequestDto, Long visitedPlaceId, List<String> imageUrls) {
+    public void saveReview(String email, ReviewRequestDto reviewRequestDto, Long visitedPlaceId, List<String> imageUrls) {
+        // 인증객체가 올바른지 확인
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다."));
+
         // VisitedPlace 존재 여부 확인
         VisitedPlace visitedPlace = visitedPlaceRepository.findById(visitedPlaceId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 방문한 장소가 존재하지 않습니다."));
+
+        // VisitedPlace가 현재 회원의 것인지 확인
+        if (!visitedPlace.getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalArgumentException("해당 방문한 장소는 현재 회원의 방문 기록이 아니므로 리뷰를 작성할 수 없습니다.");
+        }
         log.info("리뷰를 저장할 방문지 확인: 방문지 ID = {}", visitedPlaceId);
 
         // Review 엔티티 생성 및 저장
@@ -71,10 +83,17 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(String email, Long reviewId) {
+        // 리뷰가 존재하는지 확인
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다."));
-
+        // 인증객체가 올바른지 확인
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다."));
+        // 리뷰가 해당 사용자의 것인지 확인
+        if (!review.getVisitedPlace().getMember().getMemberId().equals(member.getMemberId())) {
+            throw new IllegalArgumentException("해당 리뷰를 삭제할 권한이 없습니다.");
+        }
         try {
             deleteReviewImages(review);
             log.info("리뷰 이미지가 성공적으로 삭제되었습니다: 리뷰 ID = {}", reviewId);

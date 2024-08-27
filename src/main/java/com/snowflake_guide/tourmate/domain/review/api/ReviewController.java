@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,10 +39,13 @@ public class ReviewController {
     @Operation(summary = "리뷰 등록", description = "지정된 방문지에 리뷰를 작성합니다.")
     @PostMapping(value = "/{visitedPlaceId}/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createReview(
+            Authentication authentication,
             @Parameter(description = "방문지 ID", example = "1") @PathVariable("visitedPlaceId") Long visitedPlaceId,
             @Parameter(description = "리뷰 내용 (reviewDec), 별점(rate)") @RequestPart(value = "reviewRequestDto", required = false) String reviewRequestDtoJson,
             @Parameter(description = "리뷰 이미지 파일들 (최대 3개)") @RequestPart(value = "reviewImages", required = false) MultipartFile[] reviewImages
     ) {
+        String email = authentication.getName();
+
         if (reviewRequestDtoJson == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "review_create_empty_dto", "message", "리뷰 등록 요청 dto가 비었습니다."));
         }
@@ -66,7 +70,7 @@ public class ReviewController {
 
         try {
             // 유효성 검사 통과 시, 리뷰 생성 로직 실행
-            reviewService.createReview(reviewRequestDto, visitedPlaceId, reviewImages);
+            reviewService.createReview(email, reviewRequestDto, visitedPlaceId, reviewImages);
             return ResponseEntity.ok("리뷰가 성공적으로 등록되었습니다.");
         } catch (IllegalArgumentException e) {
             log.error("리뷰 생성 중 오류 발생: {}", e.getMessage());
@@ -82,10 +86,11 @@ public class ReviewController {
     @Operation(summary = "리뷰 삭제", description = "지정된 리뷰를 삭제합니다.")
     @DeleteMapping("/review/{reviewId}")
     public ResponseEntity<?> deleteReview(
+            Authentication authentication,
             @Parameter(description = "리뷰 ID", example = "1") @PathVariable("reviewId") Long reviewId) {
         try {
-            // TODO 본인의 리뷰인 경우에만 삭제 진행
-            reviewService.deleteReview(reviewId);
+            String email = authentication.getName();
+            reviewService.deleteReview(email, reviewId);
             return ResponseEntity.ok("리뷰가 성공적으로 삭제되었습니다.");
         } catch (IllegalArgumentException e) {
             log.error("리뷰 삭제 중 오류 발생: {}", e.getMessage());
