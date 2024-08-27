@@ -1,4 +1,4 @@
-package com.snowflake_guide.tourmate.domain.member.dto;
+package com.snowflake_guide.tourmate.global.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

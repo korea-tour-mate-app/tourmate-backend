@@ -41,10 +41,6 @@ public class SignUpService {
         }
     }
 
-    public boolean existsByUsername(String username) {
-        return memberRepository.existsByName(username);
-    }
-
     public boolean existsByEmail(String email) {
         return memberRepository.existsByEmail(email);
     }
