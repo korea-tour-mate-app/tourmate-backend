@@ -26,8 +26,11 @@ public class LikeService {
     private final PlaceRepository placeRepository;
 
     @Transactional(readOnly = true)
-    public List<LikeListResponseDto> getLikedPlaces(Long memberId, Long themeId) {
+    public List<LikeListResponseDto> getLikedPlaces(String email, Long themeId) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
         List<Like> likes;
+        Long memberId = member.getMemberId();
 
         if (themeId != null) {
             // Member -> Like -> Place -> Theme
@@ -49,13 +52,12 @@ public class LikeService {
      * Like 엔티티가 존재하고 liked가 false인 경우: liked를 true로 변경
      * Like 엔티티가 존재하지 않는 경우: 새로운 Like 엔티티를 생성하고 liked를 true로 설정
      *
-     * @param memberId
-     * @param placeId
      */
     @Transactional
-    public void toggleLike(Long memberId, Long placeId) {
-        Member member = memberRepository.findById(memberId)
+    public void toggleLike(String email, Long placeId) {
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Long memberId = member.getMemberId();
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new IllegalArgumentException("Place not found"));
 
