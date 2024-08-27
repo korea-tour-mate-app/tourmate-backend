@@ -26,7 +26,10 @@ public class VisitedPlaceService {
     private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public List<VisitedPlaceListResponseDto> getVisitedPlaces(Long memberId, Long themeId) {
+    public List<VisitedPlaceListResponseDto> getVisitedPlaces(String email, Long themeId) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Long memberId = member.getMemberId();
         List<VisitedPlace> visitedPlaces;
 
         if (themeId != null) {
@@ -47,15 +50,14 @@ public class VisitedPlaceService {
      * VisitedPlace 엔티티가 존재하고 visited가 false인 경우: visited를 true로 변경
      * VisitedPlace 엔티티가 존재하지 않는 경우: 새로운 VisitedPlace 엔티티를 생성하고 visited를 true로 설정
      *
-     * @param memberId
-     * @param placeId
      */
     @Transactional
-    public void toggleVisited(Long memberId, Long placeId) {
-        Member member = memberRepository.findById(memberId)
+    public void toggleVisited(String email, Long placeId) {
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new IllegalArgumentException("Place not found"));
+        Long memberId = member.getMemberId();
 
         // VisitedPlace 조회
         Optional<VisitedPlace> visitedPlaceOpt = visitedPlaceRepository.findByMember_MemberIdAndPlace_PlaceId(memberId, placeId);
