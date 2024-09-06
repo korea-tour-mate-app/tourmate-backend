@@ -1,13 +1,11 @@
 package com.snowflake_guide.tourmate.global.tmap.routeopt.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-/**
- * TMap routeOptimization API로부터 응답받을 때 사용하는 dto
- */
 @Getter
 @Setter
 public class TMapRouteOptResponseDto {
@@ -34,22 +32,45 @@ public class TMapRouteOptResponseDto {
         @Getter
         @Setter
         public static class Geometry {
-            private String type;  // "Point" 타입 (경유지 좌표)
-            private List<Double> coordinates;  // 경도, 위도 좌표
+            private String type;  // "Point" 또는 "LineString" 타입
+
+            // Point일 경우 List<Double>, LineString일 경우 List<List<Double>>로 처리
+            private List<?> coordinates;
+
+            // 좌표가 Point일 경우
+            public List<Double> getPointCoordinates() {
+                if ("Point".equals(type)) {
+                    return (List<Double>) coordinates;
+                }
+                throw new IllegalStateException("Geometry 타입이 Point가 아닙니다.");
+            }
+
+            // 좌표가 LineString일 경우
+            public List<List<Double>> getLineStringCoordinates() {
+                if ("LineString".equals(type)) {
+                    return (List<List<Double>>) coordinates;
+                }
+                throw new IllegalStateException("Geometry 타입이 LineString이 아닙니다.");
+            }
         }
 
         @Getter
         @Setter
         public static class FeatureProperties {
             private String index;  // 경유지 순서 (0부터 시작)
-            private String viaPointId;  // 경유지 ID
+            private String viaPointId;  // 경유지 ID (nullable)
             private String viaPointName;  // 경유지 명칭
+            private String viaDetailAddress;  // 경유지 상세주소 (nullable)
+            private String groupKey;  // 그룹키 (nullable)
             private String arriveTime;  // 도착 시간
             private String completeTime;  // 완료 시간
             private String distance;  // 해당 경유지까지의 거리
             private String deliveryTime;  // 배달 시간
             private String waitTime;  // 대기 시간
-            private String pointType;  // 경유지의 타입 ("S"는 출발지, "E"는 목적지 등)
+            private String time;  // 경유지 간 소요 시간 (nullable)
+            private String Fare;  // 경유지 간 요금 (nullable), JSON 응답의 "Fare" 대소문자 맞춤
+            private String pointType;  // 경유지의 타입 ("S"는 출발지, "E"는 목적지, "B"는 경유지 등)
+            private String poiId;  // POI ID (nullable)
         }
     }
 }
