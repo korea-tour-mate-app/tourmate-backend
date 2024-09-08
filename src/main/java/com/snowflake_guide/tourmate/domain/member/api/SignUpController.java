@@ -3,12 +3,14 @@ package com.snowflake_guide.tourmate.domain.member.api;
 import com.snowflake_guide.tourmate.domain.member.dto.SignUpRequestDTO;
 import com.snowflake_guide.tourmate.domain.member.entity.Member;
 import com.snowflake_guide.tourmate.domain.member.service.SignUpService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "SingUp API", description = "회원가입하는 API")
 @RestController
 @RequestMapping("/api/auth/signup")
 public class SignUpController {
