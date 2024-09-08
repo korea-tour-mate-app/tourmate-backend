@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@FeignClient(name = "googleLoginApiClient", url = "https://www.googleapis.com")
+@FeignClient(name = "googleLoginApiClient", url = "https://openidconnect.googleapis.com")
 public interface LoginApiClient {
-    @GetMapping("/oauth2/v2/userinfo")
+    @GetMapping("/v1/userinfo")
     GoogleMemberResponse getGoogleMemberInfo(@RequestHeader(name = AUTHORIZATION) String bearerToken);
 }

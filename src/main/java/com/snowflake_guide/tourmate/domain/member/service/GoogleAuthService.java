@@ -26,10 +26,10 @@ public class GoogleAuthService {
         try {
             // 구글 사용자 정보 가져오기
             GoogleMemberResponse googleUser = loginApiClient.getGoogleMemberInfo("Bearer " + accessToken);
-
+            log.info("구글 로그인 성공 이메일: {}", googleUser.getEmail());
             // 이메일로 기존 회원 조회
             Member member = memberRepository.findByEmail(googleUser.getEmail())
-                    .orElseThrow(() -> new IllegalArgumentException("회원 정보가 존재하지 않습니다."));
+                    .orElse(null);
 
             if (member == null) {
                 // 기존 회원이 없으면 회원가입 처리
