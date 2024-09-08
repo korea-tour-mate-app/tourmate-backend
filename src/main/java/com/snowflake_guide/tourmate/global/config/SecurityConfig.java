@@ -31,7 +31,7 @@ public class SecurityConfig {
             "/api/place/{placeId}/reviews",
             "/api/auth/google-login",
             "/api/tmap/optimize-route",
-            "/api/google-map/optimize-route"
+            "/api/google-map/optimize-route/**"
     };
     @Bean
     public PasswordEncoder passwordEncoder() {
