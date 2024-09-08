@@ -20,6 +20,19 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    private static final String[] AUTH_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/api/auth/signup",
+            "/api/auth/login",
+            "/api/s3/test",
+            "/api/place/{placeId}/reviews",
+            "/api/auth/google-login",
+            "/api/tmap/optimize-route",
+            "/api/google-map/optimize-route"
+    };
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -30,8 +43,9 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll() // Swagger UI와 API 문서에 대한 접근 허용
-                                .requestMatchers("/api/auth/signup","/api/auth/login", "/api/s3/test", "/api/place/{placeId}/reviews", "/api/auth/google-login", "/api/tmap/optimize-route").permitAll() // /api/auth/signup URL에 대한 접근 허용
+                                .requestMatchers(AUTH_WHITELIST).permitAll()
+//                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll() // Swagger UI와 API 문서에 대한 접근 허용
+//                                .requestMatchers("/api/auth/signup","/api/auth/login", "/api/s3/test", "/api/place/{placeId}/reviews", "/api/auth/google-login", "/api/tmap/optimize-route").permitAll() // /api/auth/signup URL에 대한 접근 허용
                                 .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
