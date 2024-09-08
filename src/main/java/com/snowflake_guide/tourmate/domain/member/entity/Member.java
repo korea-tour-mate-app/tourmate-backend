@@ -31,6 +31,7 @@ public class Member extends BaseTimeEntity {
     private String email;
 
     @Column(nullable = false, updatable = false)
+    @Builder.Default
     private LocalDate createdAt = LocalDate.now(); // 현재 날짜 할당되게 함
 
     @OneToMany(mappedBy = "member")
