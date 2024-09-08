@@ -25,7 +25,7 @@ public class GoogleAuthService {
     public SignInResponseDTO processGoogleLogin(String accessToken) {
         try {
             // 구글 사용자 정보 가져오기
-            GoogleMemberResponse googleUser = loginApiClient.getGoogleMemberInfo("Bearer " + accessToken);
+            GoogleMemberResponse googleUser = loginApiClient.getGoogleMemberInfo(accessToken);
             log.info("구글 로그인 성공 이메일: {}", googleUser.getEmail());
             // 이메일로 기존 회원 조회
             Member member = memberRepository.findByEmail(googleUser.getEmail())
