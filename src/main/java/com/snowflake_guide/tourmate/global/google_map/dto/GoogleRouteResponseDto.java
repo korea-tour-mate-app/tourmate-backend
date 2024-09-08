@@ -1,9 +1,11 @@
 package com.snowflake_guide.tourmate.global.google_map.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import java.util.List;
 
 @Data
+@Builder
 public class GoogleRouteResponseDto {
 
     // 대중교통 구간 정보 리스트
@@ -13,6 +15,7 @@ public class GoogleRouteResponseDto {
     private String polyline;
 
     @Data
+    @Builder
     public static class TransitDetailsDto {
 
         // 대중교통 수단 유형 (예: 버스, 지하철, 기차 등)

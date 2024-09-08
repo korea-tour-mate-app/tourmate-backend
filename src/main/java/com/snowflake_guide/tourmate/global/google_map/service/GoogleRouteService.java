@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -21,7 +20,7 @@ import java.util.List;
 public class GoogleRouteService {
 
     private final GoogleDirectionsClient googleDirectionsClient;
-    private final ObjectMapper objectMapper;  // JSON 파싱용 ObjectMapper
+    private final ObjectMapper objectMapper;
 
     @Value("${google.api.key}")
     private String apiKey;
@@ -32,67 +31,56 @@ public class GoogleRouteService {
                 requestDto.getOrigin(),
                 requestDto.getDestination(),
                 waypoints,
-                "transit",  // 대중교통 모드
+                "transit", // 대중교통 모드
                 apiKey
         );
 
-        GoogleRouteResponseDto responseDto = new GoogleRouteResponseDto();
+        try {
+            return parseDirectionsResponse(response);
+        } catch (IOException e) {
+            log.error("Failed to parse Google Directions API response: {}", e.getMessage());
+            throw new RuntimeException("대중교통 경로 계산 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    private GoogleRouteResponseDto parseDirectionsResponse(String response) throws IOException {
+        JsonNode root = objectMapper.readTree(response);
         List<GoogleRouteResponseDto.TransitDetailsDto> transitDetailsList = new ArrayList<>();
 
-        try {
-            JsonNode root = objectMapper.readTree(response);
-            JsonNode legs = root.path("routes").get(0).path("legs");
+        JsonNode legs = root.path("routes").get(0).path("legs");
+        for (JsonNode leg : legs) {
+            String startAddress = leg.path("start_address").asText();
+            String endAddress = leg.path("end_address").asText();
 
-            // 각 구간(A->B, B->C 등)별로 대중교통 정보 추출
-            for (JsonNode leg : legs) {
-                String startAddress = leg.path("start_address").asText();
-                String endAddress = leg.path("end_address").asText();
+            for (JsonNode step : leg.path("steps")) {
+                if (step.has("transit_details")) {
+                    JsonNode transitDetails = step.path("transit_details");
 
-                for (JsonNode step : leg.path("steps")) {
-                    if (step.has("transit_details")) {
-                        JsonNode transitDetails = step.path("transit_details");
-                        String vehicleType = transitDetails.path("line").path("vehicle").path("type").asText();  // 대중교통 수단 유형
-                        String lineName = transitDetails.path("line").has("short_name")
-                                ? transitDetails.path("line").path("short_name").asText()
-                                : transitDetails.path("line").path("name").asText();  // 버스/지하철 노선 또는 이름
-                        String departureStop = transitDetails.path("departure_stop").has("name")
-                                ? transitDetails.path("departure_stop").path("name").asText()
-                                : "N/A";  // 출발 정류장 (없을 경우 "N/A")
-                        String arrivalStop = transitDetails.path("arrival_stop").has("name")
-                                ? transitDetails.path("arrival_stop").path("name").asText()
-                                : "N/A";  // 도착 정류장 (없을 경우 "N/A")
-                        String duration = step.path("duration").path("text").asText();  // 걸리는 시간
-                        String distance = step.path("distance").path("text").asText();  // 거리
-
-                        // 각 구간의 대중교통 정보 저장
-                        GoogleRouteResponseDto.TransitDetailsDto detailsDto = new GoogleRouteResponseDto.TransitDetailsDto();
-                        detailsDto.setVehicleType(vehicleType);
-                        detailsDto.setLineName(lineName);
-                        detailsDto.setDepartureStop(departureStop);
-                        detailsDto.setArrivalStop(arrivalStop);
-                        detailsDto.setDuration(duration);
-                        detailsDto.setDistance(distance);
-                        detailsDto.setStartAddress(startAddress);
-                        detailsDto.setEndAddress(endAddress);
-
-                        transitDetailsList.add(detailsDto);
-                    }
+                    transitDetailsList.add(GoogleRouteResponseDto.TransitDetailsDto.builder()
+                            .vehicleType(transitDetails.path("line").path("vehicle").path("type").asText())
+                            .lineName(transitDetails.path("line").has("short_name")
+                                    ? transitDetails.path("line").path("short_name").asText()
+                                    : transitDetails.path("line").path("name").asText())
+                            .departureStop(transitDetails.path("departure_stop").has("name")
+                                    ? transitDetails.path("departure_stop").path("name").asText()
+                                    : "N/A")
+                            .arrivalStop(transitDetails.path("arrival_stop").has("name")
+                                    ? transitDetails.path("arrival_stop").path("name").asText()
+                                    : "N/A")
+                            .duration(step.path("duration").path("text").asText())
+                            .distance(step.path("distance").path("text").asText())
+                            .startAddress(startAddress)
+                            .endAddress(endAddress)
+                            .build());
                 }
             }
-
-            // 전체 경로의 overview_polyline.points를 추출하여 저장
-            String polyline = root.path("routes")
-                    .get(0)
-                    .path("overview_polyline")
-                    .path("points")
-                    .asText();
-            responseDto.setPolyline(polyline);  // 전체 경로 폴리라인 설정
-            responseDto.setTransitDetailsList(transitDetailsList);
-        } catch (IOException e) {
-            log.error("Failed to parse Google Directions API response", e);
-            throw new RuntimeException("대중교통 경로 계산 중 오류가 발생했습니다.");
         }
 
-        return responseDto;
+        String polyline = root.path("routes").get(0).path("overview_polyline").path("points").asText();
+
+        return GoogleRouteResponseDto.builder()
+                .polyline(polyline)
+                .transitDetailsList(transitDetailsList)
+                .build();
     }
 }
