@@ -24,7 +24,7 @@ public class SignUpService {
         validatePassword(signUpRequestDTO.getPassword());
 
         Member member = new Member();
-        member.setName(signUpRequestDTO.getName());
+        member.setNickname(signUpRequestDTO.getName());
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signUpRequestDTO.getPassword());
