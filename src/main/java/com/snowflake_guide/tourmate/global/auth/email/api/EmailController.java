@@ -3,6 +3,7 @@ package com.snowflake_guide.tourmate.global.auth.email.api;
 import com.snowflake_guide.tourmate.global.auth.email.dto.VerifyCodeRequest;
 import com.snowflake_guide.tourmate.global.auth.email.dto.VerifyEmailRequest;
 import com.snowflake_guide.tourmate.global.auth.email.service.EmailService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 이메일 관련 인증 API 컨트롤러 클래스
  * 이메일 인증, 인증 코드 확인 등의 기능을 제공한다.
  */
+@Tag(name = "Email Code Send & Verify API", description = "이메일 인증코드를 발송하고, 보낸 인증코드가 올바른지 검증하는 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
