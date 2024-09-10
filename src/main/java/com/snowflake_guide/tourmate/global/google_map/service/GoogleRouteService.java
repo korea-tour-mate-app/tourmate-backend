@@ -34,7 +34,7 @@ public class GoogleRouteService {
                 "transit", // 대중교통 모드
                 apiKey
         );
-
+        log.info("API Response: {}", response);
         try {
             return parseDirectionsResponse(response);
         } catch (IOException e) {
@@ -45,6 +45,13 @@ public class GoogleRouteService {
 
     private GoogleRouteResponseDto parseDirectionsResponse(String response) throws IOException {
         JsonNode root = objectMapper.readTree(response);
+
+        // 응답이 null인지 확인
+        if (root == null) {
+            log.error("Response body is null");
+            throw new NullPointerException("Response body is null");
+        }
+
         List<GoogleRouteResponseDto.TransitDetailsDto> transitDetailsList = new ArrayList<>();
 
         JsonNode legs = root.path("routes").get(0).path("legs");
