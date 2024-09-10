@@ -2,6 +2,7 @@ package com.snowflake_guide.tourmate.global.tmap.routeopt.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * t-map routeOptimization API에 요청할 때 사용하는 dto
  */
 @Getter
+@Setter
 public class TMapRouteOptRequestDto {
     private String startName;  // 출발지 명칭
     private String startX;  // 출발지 X좌표 (경도)
@@ -22,10 +24,25 @@ public class TMapRouteOptRequestDto {
 
     @Getter
     @Setter
+    @ToString
     public static class ViaPoint {
         private String viaPointId;  // 경유지 ID (PK)
         private String viaPointName;  // 경유지 명칭
         private String viaX;  // 경유지 X좌표 (경도)
         private String viaY;  // 경유지 Y좌표 (위도)
+    }
+
+    @Override
+    public String toString() {
+        return "TMapRouteOptRequestDto{" +
+                "startName='" + startName + '\'' +
+                ", startX='" + startX + '\'' +
+                ", startY='" + startY + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endName='" + endName + '\'' +
+                ", endX='" + endX + '\'' +
+                ", endY='" + endY + '\'' +
+                ", viaPoints=" + viaPoints +
+                '}';
     }
 }

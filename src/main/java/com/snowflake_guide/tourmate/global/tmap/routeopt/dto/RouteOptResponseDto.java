@@ -15,6 +15,7 @@ public class RouteOptResponseDto {
     private String totalDistance;  // 경로 총 거리 (단위: m)
     private String totalTime;      // 경로 총 소요 시간 (단위: 초)
     private String totalFare;      // 경로 총 요금 (단위: 원)
+    private String visitPlaces;  // 전체 방문장소 순서
 
     // 경로(길) 정보 리스트
     private List<Path> paths;
