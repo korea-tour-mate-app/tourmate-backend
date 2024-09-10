@@ -22,13 +22,13 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    @Column(length = 100, nullable = false)
-    private String name;
+    @Column(length = 100, nullable = false, unique = true)
+    private String nickname; // 닉네임은 중복 불가능
 
     private String password;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String email; // 이메일은 중복 불가능
 
     @Column(nullable = false, updatable = false)
     @Builder.Default
