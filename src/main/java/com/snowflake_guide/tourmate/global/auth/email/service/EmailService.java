@@ -123,4 +123,11 @@ public class EmailService {
     // 인증코드 기록용 클래스 (Java 16의 record 사용)
     private record VerificationCode(String code) {
     }
+
+    // 이미 인증을 마친 이메일인지 확인
+    public boolean isEmailVerified(String email) {
+        VerificationCode storedCode = verificationCodes.get(email);
+        // 인증 코드가 없거나, 확인된 상태라면 인증이 완료된 것으로 간주
+        return storedCode != null && storedCode.code().isEmpty();
+    }
 }
