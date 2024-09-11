@@ -10,17 +10,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SignUpService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
+    @Transactional
     public Member signUp(SignUpRequestDTO signUpRequestDTO) {
         // 이메일 인증 여부 확인
         if (!emailService.isEmailVerified(signUpRequestDTO.getEmail())) {

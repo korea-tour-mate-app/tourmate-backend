@@ -34,7 +34,12 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
     private final MemberService memberService;
     private final SecureRandom secureRandom = new SecureRandom();
+
+    // 이메일별 인증코드를 저장하는 로직
     private final Map<String, VerificationCode> verificationCodes = new ConcurrentHashMap<>();
+
+    // 이메일별 인증여부를 저장하는 로직
+    private final Map<String, Boolean> verifiedEmails = new ConcurrentHashMap<>();
 
     // 이메일 인증 요청
     public ResponseEntity<Map<String, String>> verifyEmail(String email, String type) {
@@ -99,7 +104,8 @@ public class EmailService {
         if (storedCode == null || !storedCode.code().equals(inputCode)) {
             return createErrorResponse("invalid_code", INVALID_CODE_ERROR);
         }
-
+        // 인증된 이메일 내역에 저장
+        verifiedEmails.put(email, true);
         return createSuccessResponse(CORRECT_CODE_MESSAGE);
     }
 
@@ -126,8 +132,6 @@ public class EmailService {
 
     // 이미 인증을 마친 이메일인지 확인
     public boolean isEmailVerified(String email) {
-        VerificationCode storedCode = verificationCodes.get(email);
-        // 인증 코드가 없거나, 확인된 상태라면 인증이 완료된 것으로 간주
-        return storedCode != null && storedCode.code().isEmpty();
+        return verifiedEmails.getOrDefault(email, false);
     }
 }
