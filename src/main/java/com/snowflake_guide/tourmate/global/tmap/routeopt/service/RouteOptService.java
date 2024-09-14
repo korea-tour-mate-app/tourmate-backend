@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,7 +45,7 @@ public class RouteOptService {
             if (tMapResponse == null) {
                 throw new RuntimeException("TMap API 응답이 비어있습니다.");
             }
-            log.info("TMap API 응답: {}", tMapResponse);
+            log.info("TMap API 응답: {}", tMapResponse.toString());
 
             // RouteOptResponseDto로 필요한 정보만 추출
             RouteOptResponseDto responseDto = new RouteOptResponseDto();
@@ -63,15 +64,44 @@ public class RouteOptService {
         }
     }
 
-    // 전체 방문장소 순서 추가
+    // 전체 방문장소 순서를 포함한 장소 리스트 반환
     private static void getSeq(TMapRouteOptResponseDto tMapResponse, RouteOptResponseDto responseDto) {
-        List<String> visitPlaces = tMapResponse.getFeatures().stream()
-                .map(feature -> feature.getProperties().getViaPointName())
-                .filter(name -> name != null && !name.isEmpty())
-                .distinct()  // 중복 제거
-                .collect(Collectors.toList());
-        responseDto.setVisitPlaces(String.join(", ", visitPlaces));
+        List<RouteOptResponseDto.VisitPlace> visitPlaces = new ArrayList<>();
+
+        // "type"이 "Point"인 feature만 처리
+        tMapResponse.getFeatures().stream()
+                .filter(feature -> "Point".equals(feature.getGeometry().getType()))  // Point 타입만 필터링
+                .forEach(feature -> {
+                    RouteOptResponseDto.VisitPlace visitPlace = new RouteOptResponseDto.VisitPlace();
+
+                    // viaPointName을 가져와 설정
+                    String viaPointName = feature.getProperties().getViaPointName();
+                    if (viaPointName != null) {
+                        // [숫자]로 시작하는 부분을 제거
+                        viaPointName = viaPointName.replaceAll("^\\[\\d+\\]\\s*", "");
+                    }
+                    visitPlace.setName(viaPointName);
+
+                    // 경로순번인 index를 가져와 설정
+                    String index = feature.getProperties().getIndex();
+                    visitPlace.setOrder(index);  // AtomicInteger로 순서 증가
+
+
+                    // coordinates에서 경도, 위도 설정
+                    List<?> coordinates = feature.getGeometry().getCoordinates();
+                    if (coordinates != null && coordinates.size() >= 2) {
+                        // 명시적으로 Object를 Double로 변환
+                        visitPlace.setLongitude(((Number) coordinates.get(0)).doubleValue());  // 경도 (X좌표)
+                        visitPlace.setLatitude(((Number) coordinates.get(1)).doubleValue());   // 위도 (Y좌표)
+                    }
+                    // 방문 장소 리스트에 추가
+                    visitPlaces.add(visitPlace);
+                });
+
+        // 최종적으로 responseDto에 visitPlaces 리스트 설정
+        responseDto.setVisitPlaces(visitPlaces);
     }
+
 
     // 경로의 총 거리, 총 시간, 총 요금 설정
     private static void getSum(RouteOptResponseDto responseDto, TMapRouteOptResponseDto tMapResponse) {
