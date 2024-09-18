@@ -56,6 +56,8 @@ public class GoogleDetailsService {
             restaurantReviewResponseDto.getReviews().add(reviewDto);
         });
 
+        log.info("RestaurantReviewResponseDto: {}", restaurantReviewResponseDto.toString());
+
         restaurantReviewService.saveReviews(restaurant, restaurantReviewResponseDto);
         // 변환된 리뷰 정보 및 전화번호, 영업시간 정보를 포함한 DTO 반환
 
