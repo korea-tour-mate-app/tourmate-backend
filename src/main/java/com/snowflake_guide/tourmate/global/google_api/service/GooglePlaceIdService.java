@@ -1,10 +1,8 @@
 package com.snowflake_guide.tourmate.global.google_api.service;
 
 import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
-import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
 import com.snowflake_guide.tourmate.domain.restaurant.service.RestaurantService;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceIdClient;
-import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIRequestDto;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
 import com.snowflake_guide.tourmate.global.google_api.dto.GoogleRestaurantResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,7 @@ public class GooglePlaceIdService {
     @Value("${google.api.key}")
     private String apiKey;
 
-    public ResponseEntity<?> getTopRestaurantPlaceIds(GooglePlacesAPIRequestDto requestDto) {
+    public ResponseEntity<?> getTopRestaurantPlaces() {
         // Google Places API 호출
         GooglePlacesAPIResponseDto topRestaurants = googlePlaceIdClient.getTopRestaurants(
                 "서울 음식점", // query parameter
@@ -55,31 +53,22 @@ public class GooglePlaceIdService {
             dto.setLatitude(result.getGeometry().getLocation().getLat());
             dto.setLongitude(result.getGeometry().getLocation().getLng());
 
-            // opening_hours가 null이 아닌 경우에만 처리
-            if (result.getOpening_hours() != null) {
-                dto.setOpenNow(result.getOpening_hours().isOpen_now());
-            } else {
-                dto.setOpenNow(false); // default로 영업 중이 아님
-            }
-
-            // 사진 참조값 리스트 설정
-            if (result.getPhotos() != null) {
-                List<String> photoReferences = new ArrayList<>();
-                result.getPhotos().forEach(photo -> photoReferences.add(photo.getPhoto_reference()));
-                dto.setPhotoReferences(photoReferences);
-            }
-
             dto.setPlaceId(result.getPlace_id());
             dto.setPriceLevel(result.getPrice_level());
             dto.setReference(result.getReference());
             dto.setUserRatingsTotal(result.getUser_ratings_total());
 
+            // dto 값 로그 찍기
+            log.info("Restaurant DTO: {}", dto.toString());
+
             // dto에 저장
             placeDetailResults.add(dto);
         });
 
+        log.info("현재까지 저장된 DTO 개수: {}", placeDetailResults.size());
+
         // 모아둔 레스토랑 리스트를 한 번에 저장
-        restaurantService.saveAllRestaurants(topRestaurants.getResults());
+        restaurantService.saveAllRestaurants(placeDetailResults);
 
         // placeDetailResults와 next_page_token 설정
         googleRestaurantResponseDto.setPlaceDetailResults(placeDetailResults);

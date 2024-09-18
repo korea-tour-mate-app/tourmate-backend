@@ -17,13 +17,12 @@ public class Restaurant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long restaurantId;
 
     private String name; // 장소 이름
     private String formattedAddress; // 주소
     private double latitude; // 위도
     private double longitude; // 경도
-    private boolean openNow; // 현재 영업 중 여부
     private String placeId; // 장소 ID
     private int priceLevel; // 가격 수준
     private String reference; // 참조값

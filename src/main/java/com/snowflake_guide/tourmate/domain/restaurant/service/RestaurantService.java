@@ -3,6 +3,7 @@ package com.snowflake_guide.tourmate.domain.restaurant.service;
 import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
 import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
+import com.snowflake_guide.tourmate.global.google_api.dto.GoogleRestaurantResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,25 +17,25 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
 
     @Transactional
-    public void saveAllRestaurants(List<GooglePlacesAPIResponseDto.Result> results) {
+    public void saveAllRestaurants(List<GoogleRestaurantResponseDto.PlaceDetailResult> list) {
         List<Restaurant> restaurants = new ArrayList<>();
 
-        for (GooglePlacesAPIResponseDto.Result result : results) {
+        for (GoogleRestaurantResponseDto.PlaceDetailResult result : list) {
             Restaurant restaurant = Restaurant.builder()
                     .name(result.getName())
-                    .formattedAddress(result.getFormatted_address())
-                    .latitude(result.getGeometry().getLocation().getLat())
-                    .longitude(result.getGeometry().getLocation().getLng())
-                    .openNow(result.getOpening_hours() != null && result.getOpening_hours().isOpen_now())
-                    .placeId(result.getPlace_id())
-                    .priceLevel(result.getPrice_level())
+                    .formattedAddress(result.getFormattedAddress())
+                    .latitude(result.getLatitude())
+                    .longitude(result.getLongitude())
+                    .placeId(result.getPlaceId())
+                    .priceLevel(result.getPriceLevel())
                     .reference(result.getReference())
-                    .userRatingsTotal(result.getUser_ratings_total())
+                    .userRatingsTotal(result.getUserRatingsTotal())
                     .build();
 
             restaurants.add(restaurant); // 리스트에 레스토랑 추가
         }
 
-        restaurantRepository.saveAll(restaurants); // 리스트로 저장
+        // Restaurant 엔티티 리스트를 한꺼번에 저장
+        restaurantRepository.saveAll(restaurants);
     }
 }

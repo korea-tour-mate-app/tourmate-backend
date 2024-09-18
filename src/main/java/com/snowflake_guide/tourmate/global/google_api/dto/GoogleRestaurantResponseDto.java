@@ -18,11 +18,23 @@ public class GoogleRestaurantResponseDto {
         private String formattedAddress; // 주소
         private double latitude; // 위도
         private double longitude; // 경도
-        private boolean openNow; // 현재 영업 중 여부
-        private List<String> photoReferences; // 사진 참조값 리스트
         private String placeId; // 장소 ID
         private int priceLevel; // 가격 수준
         private String reference; // 참조값
         private int userRatingsTotal; // 리뷰 수
+
+        @Override
+        public String toString() {
+            return "PlaceDetailResult{" +
+                    "name='" + name + '\'' +
+                    ", formattedAddress='" + formattedAddress + '\'' +
+                    ", latitude=" + latitude +
+                    ", longitude=" + longitude +
+                    ", placeId='" + placeId + '\'' +
+                    ", priceLevel=" + priceLevel +
+                    ", reference='" + reference + '\'' +
+                    ", userRatingsTotal=" + userRatingsTotal +
+                    '}';
+        }
     }
 }
