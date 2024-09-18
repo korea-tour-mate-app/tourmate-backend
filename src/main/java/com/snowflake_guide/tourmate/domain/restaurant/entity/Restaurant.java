@@ -6,8 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -26,6 +24,7 @@ public class Restaurant {
     private String placeId; // 장소 ID
     private int priceLevel; // 가격 수준
     private String reference; // 참조값
+    private double rating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
 
     // 리뷰와의 1:N 관계 설정

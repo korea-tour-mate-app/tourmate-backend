@@ -12,6 +12,7 @@ public interface GooglePlaceIdClient {
             @RequestParam("query") String query,
             @RequestParam("type") String type,
             @RequestParam("rankby") String rankBy,
-            @RequestParam("key") String apiKey
+            @RequestParam("key") String apiKey,
+            @RequestParam("language") String language
     );
 }

@@ -2,7 +2,6 @@ package com.snowflake_guide.tourmate.domain.restaurant.service;
 
 import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
 import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
-import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
 import com.snowflake_guide.tourmate.global.google_api.dto.GoogleRestaurantResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +29,7 @@ public class RestaurantService {
                     .priceLevel(result.getPriceLevel())
                     .reference(result.getReference())
                     .userRatingsTotal(result.getUserRatingsTotal())
+                    .rating(result.getRating())
                     .build();
 
             restaurants.add(restaurant); // 리스트에 레스토랑 추가

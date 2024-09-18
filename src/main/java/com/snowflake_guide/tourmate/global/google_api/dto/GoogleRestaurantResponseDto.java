@@ -22,6 +22,7 @@ public class GoogleRestaurantResponseDto {
         private int priceLevel; // 가격 수준
         private String reference; // 참조값
         private int userRatingsTotal; // 리뷰 수
+        private double rating; // 별점
 
         @Override
         public String toString() {
@@ -34,6 +35,7 @@ public class GoogleRestaurantResponseDto {
                     ", priceLevel=" + priceLevel +
                     ", reference='" + reference + '\'' +
                     ", userRatingsTotal=" + userRatingsTotal +
+                    ", rating=" + rating +
                     '}';
         }
     }

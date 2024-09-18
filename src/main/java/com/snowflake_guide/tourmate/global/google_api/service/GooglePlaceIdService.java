@@ -1,6 +1,5 @@
 package com.snowflake_guide.tourmate.global.google_api.service;
 
-import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
 import com.snowflake_guide.tourmate.domain.restaurant.service.RestaurantService;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceIdClient;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
@@ -32,7 +31,8 @@ public class GooglePlaceIdService {
                 "서울 음식점", // query parameter
                 "restaurant", // type
                 "prominence", // rankby
-                apiKey // API key
+                apiKey, // API key
+                "ko" // 한국어로 결과 요청
         );
 
         // 응답이 성공적이지 않을 경우 에러 메시지 반환
@@ -43,26 +43,29 @@ public class GooglePlaceIdService {
         // GoogleRestaurantResponseDto 객체 생성
         GoogleRestaurantResponseDto googleRestaurantResponseDto = new GoogleRestaurantResponseDto();
         List<GoogleRestaurantResponseDto.PlaceDetailResult> placeDetailResults = new ArrayList<>();
-        List<Restaurant> restaurants = new ArrayList<>(); // 한꺼번에 저장할 레스토랑 리스트
 
         // 응답을 변환해서 placeDetailResults에 저장
         topRestaurants.getResults().forEach(result -> {
             GoogleRestaurantResponseDto.PlaceDetailResult dto = new GoogleRestaurantResponseDto.PlaceDetailResult();
-            dto.setName(result.getName());
             dto.setFormattedAddress(result.getFormatted_address());
-            dto.setLatitude(result.getGeometry().getLocation().getLat());
-            dto.setLongitude(result.getGeometry().getLocation().getLng());
+            if (result.getFormatted_address().contains("서울")) {
+                // 서울에 있는 경우에만 리스트에 추가
+                dto.setName(result.getName());
+                dto.setLatitude(result.getGeometry().getLocation().getLat());
+                dto.setLongitude(result.getGeometry().getLocation().getLng());
+                dto.setPlaceId(result.getPlace_id());
+                dto.setPriceLevel(result.getPrice_level());
+                dto.setReference(result.getReference());
+                dto.setRating(result.getRating());
+                dto.setUserRatingsTotal(result.getUser_ratings_total());
 
-            dto.setPlaceId(result.getPlace_id());
-            dto.setPriceLevel(result.getPrice_level());
-            dto.setReference(result.getReference());
-            dto.setUserRatingsTotal(result.getUser_ratings_total());
+                // dto에 저장
+                placeDetailResults.add(dto);
 
-            // dto 값 로그 찍기
-            log.info("Restaurant DTO: {}", dto.toString());
-
-            // dto에 저장
-            placeDetailResults.add(dto);
+                log.info("Restaurant DTO: {}", dto.toString());
+            } else {
+                log.info("서울이 아닌 주소이므로 저장을 하지 않습니다.: {}", dto.getFormattedAddress());
+            }
         });
 
         log.info("현재까지 저장된 DTO 개수: {}", placeDetailResults.size());
