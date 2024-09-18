@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class GoogleRestaurantResponseDto {
+public class RestaurantResponseDto {
     List<PlaceDetailResult> placeDetailResults;
     private String next_page_token;
 

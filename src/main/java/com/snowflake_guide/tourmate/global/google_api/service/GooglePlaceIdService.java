@@ -3,7 +3,7 @@ package com.snowflake_guide.tourmate.global.google_api.service;
 import com.snowflake_guide.tourmate.domain.restaurant.service.RestaurantService;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceIdClient;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
-import com.snowflake_guide.tourmate.global.google_api.dto.GoogleRestaurantResponseDto;
+import com.snowflake_guide.tourmate.global.google_api.dto.RestaurantResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,12 +41,12 @@ public class GooglePlaceIdService {
         }
 
         // GoogleRestaurantResponseDto 객체 생성
-        GoogleRestaurantResponseDto googleRestaurantResponseDto = new GoogleRestaurantResponseDto();
-        List<GoogleRestaurantResponseDto.PlaceDetailResult> placeDetailResults = new ArrayList<>();
+        RestaurantResponseDto restaurantResponseDto = new RestaurantResponseDto();
+        List<RestaurantResponseDto.PlaceDetailResult> placeDetailResults = new ArrayList<>();
 
         // 응답을 변환해서 placeDetailResults에 저장
         topRestaurants.getResults().forEach(result -> {
-            GoogleRestaurantResponseDto.PlaceDetailResult dto = new GoogleRestaurantResponseDto.PlaceDetailResult();
+            RestaurantResponseDto.PlaceDetailResult dto = new RestaurantResponseDto.PlaceDetailResult();
             dto.setFormattedAddress(result.getFormatted_address());
             if (result.getFormatted_address().contains("서울")) {
                 // 서울에 있는 경우에만 리스트에 추가
@@ -74,10 +74,10 @@ public class GooglePlaceIdService {
         restaurantService.saveAllRestaurants(placeDetailResults);
 
         // placeDetailResults와 next_page_token 설정
-        googleRestaurantResponseDto.setPlaceDetailResults(placeDetailResults);
-        googleRestaurantResponseDto.setNext_page_token(topRestaurants.getNext_page_token());
+        restaurantResponseDto.setPlaceDetailResults(placeDetailResults);
+        restaurantResponseDto.setNext_page_token(topRestaurants.getNext_page_token());
 
         // 응답 반환
-        return new ResponseEntity<>(googleRestaurantResponseDto, HttpStatus.OK);
+        return new ResponseEntity<>(restaurantResponseDto, HttpStatus.OK);
     }
 }

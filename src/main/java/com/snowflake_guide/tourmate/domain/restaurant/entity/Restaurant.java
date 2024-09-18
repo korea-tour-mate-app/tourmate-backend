@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -26,6 +28,16 @@ public class Restaurant {
     private String reference; // 참조값
     private double rating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
+    private String formattedPhoneNumber; // 전화번호
+    private String weekdayText; // 요일별 영업시간 텍스트
+
+    public void setFormattedPhoneNumber(String formattedPhoneNumber) {
+        this.formattedPhoneNumber = formattedPhoneNumber;
+    }
+
+    public void setWeekdayText(String weekdayText) {
+        this.weekdayText = weekdayText;
+    }
 
     // 리뷰와의 1:N 관계 설정
 //    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)

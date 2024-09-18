@@ -2,7 +2,7 @@ package com.snowflake_guide.tourmate.domain.restaurant.service;
 
 import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
 import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
-import com.snowflake_guide.tourmate.global.google_api.dto.GoogleRestaurantResponseDto;
+import com.snowflake_guide.tourmate.global.google_api.dto.RestaurantResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +16,10 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
 
     @Transactional
-    public void saveAllRestaurants(List<GoogleRestaurantResponseDto.PlaceDetailResult> list) {
+    public void saveAllRestaurants(List<RestaurantResponseDto.PlaceDetailResult> list) {
         List<Restaurant> restaurants = new ArrayList<>();
 
-        for (GoogleRestaurantResponseDto.PlaceDetailResult result : list) {
+        for (RestaurantResponseDto.PlaceDetailResult result : list) {
             Restaurant restaurant = Restaurant.builder()
                     .name(result.getName())
                     .formattedAddress(result.getFormattedAddress())
