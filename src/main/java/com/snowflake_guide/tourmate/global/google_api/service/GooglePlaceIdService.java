@@ -1,5 +1,8 @@
 package com.snowflake_guide.tourmate.global.google_api.service;
 
+import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
+import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
+import com.snowflake_guide.tourmate.domain.restaurant.service.RestaurantService;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceIdClient;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIRequestDto;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
@@ -20,6 +23,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class GooglePlaceIdService {
     private final GooglePlaceIdClient googlePlaceIdClient;
+    private final RestaurantService restaurantService;
 
     @Value("${google.api.key}")
     private String apiKey;
@@ -41,6 +45,7 @@ public class GooglePlaceIdService {
         // GoogleRestaurantResponseDto 객체 생성
         GoogleRestaurantResponseDto googleRestaurantResponseDto = new GoogleRestaurantResponseDto();
         List<GoogleRestaurantResponseDto.PlaceDetailResult> placeDetailResults = new ArrayList<>();
+        List<Restaurant> restaurants = new ArrayList<>(); // 한꺼번에 저장할 레스토랑 리스트
 
         // 응답을 변환해서 placeDetailResults에 저장
         topRestaurants.getResults().forEach(result -> {
@@ -69,8 +74,12 @@ public class GooglePlaceIdService {
             dto.setReference(result.getReference());
             dto.setUserRatingsTotal(result.getUser_ratings_total());
 
+            // dto에 저장
             placeDetailResults.add(dto);
         });
+
+        // 모아둔 레스토랑 리스트를 한 번에 저장
+        restaurantService.saveAllRestaurants(topRestaurants.getResults());
 
         // placeDetailResults와 next_page_token 설정
         googleRestaurantResponseDto.setPlaceDetailResults(placeDetailResults);
