@@ -34,7 +34,7 @@ public class GoogleDetailsService {
             throw new RuntimeException("Restaurant not found with placeId: " + placeId);
         }
 
-        // Google Places API를 사용하여 리뷰 정보 가져오기
+        // Google Details API를 사용하여 리뷰 정보 가져오기
         GooglePlaceDetailsResponseDto responseDto = googlePlaceReviewClient.getPlaceReviews(placeId, apiKey, "ko");  // 한글로 응답을 받기 위한 language 파라미터
 
         // 리뷰 정보를 변환한 RestaurantReviewResponseDto 반환
@@ -56,7 +56,6 @@ public class GoogleDetailsService {
             reviewDto.setRelative_time_description(review.getRelative_time_description());
             reviewDto.setTime(review.getTime());
             reviewDto.setLanguage(review.getLanguage());
-            reviewDto.setProfile_photo_url(review.getProfile_photo_url());
 
             // 리뷰 정보를 restaurantReviewResponseDto에 추가
             restaurantReviewResponseDto.getReviews().add(reviewDto);

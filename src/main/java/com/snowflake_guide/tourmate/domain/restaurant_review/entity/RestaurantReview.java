@@ -19,7 +19,7 @@ public class RestaurantReview {
 
     private String authorName; // 작성자 이름
     private String language; // 언어
-    private double rating; // 별점
+    private double reviewRating; // 별점
     private String relativeTimeDescription; // 상대적 시간
 
     @Column(columnDefinition = "TEXT") // 텍스트 필드를 TEXT 타입으로 설정

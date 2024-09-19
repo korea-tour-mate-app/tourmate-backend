@@ -36,7 +36,7 @@ public class RestaurantReviewService {
             RestaurantReview restaurantReview = RestaurantReview.builder()
                     .authorName(reviewDto.getAuthor_name())
                     .language(reviewDto.getLanguage())
-                    .rating(reviewDto.getRating())
+                    .reviewRating(reviewDto.getRating())
                     .relativeTimeDescription(reviewDto.getRelative_time_description())
                     .text(reviewDto.getText())
                     .time(reviewDto.getTime())

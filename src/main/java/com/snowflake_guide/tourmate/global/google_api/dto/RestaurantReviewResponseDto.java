@@ -26,7 +26,6 @@ public class RestaurantReviewResponseDto {
     public static class Review {
         private String author_name; // 작성자 이름
         private String language; // 언어
-        private String profile_photo_url; // 작성자 프로필 이미지 URL
         private double rating; // 별점
         private String relative_time_description; // 상대적 시간
         private String text; // 리뷰 내용
@@ -37,7 +36,6 @@ public class RestaurantReviewResponseDto {
             return "Review{" +
                     "author_name='" + author_name + '\'' +
                     ", language='" + language + '\'' +
-                    ", profile_photo_url='" + profile_photo_url + '\'' +
                     ", rating=" + rating +
                     ", relative_time_description='" + relative_time_description + '\'' +
                     ", text='" + text + '\'' +

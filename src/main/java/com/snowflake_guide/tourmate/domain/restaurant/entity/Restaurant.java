@@ -1,11 +1,14 @@
 package com.snowflake_guide.tourmate.domain.restaurant.entity;
 
+import com.snowflake_guide.tourmate.domain.restaurant_review.entity.RestaurantReview;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -28,7 +31,7 @@ public class Restaurant {
     private String placeId; // 장소 ID
     private int priceLevel; // 가격 수준
     private String reference; // 참조값
-    private double rating; // 리뷰값
+    private double totalRating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
     private String nextPageToken; // 장소 요청하는 다음 토큰
     private String formattedPhoneNumber; // 전화번호
@@ -42,6 +45,6 @@ public class Restaurant {
     }
 
     // 리뷰와의 1:N 관계 설정
-//    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<RestaurantReview> reviews = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RestaurantReview> reviews = new ArrayList<>();
 }
