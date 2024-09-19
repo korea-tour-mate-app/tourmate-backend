@@ -1,5 +1,6 @@
 package com.snowflake_guide.tourmate.domain.baggage_storage.service;
 
+import com.snowflake_guide.tourmate.domain.baggage_storage.dto.BaggageStorageDetailResponseDto;
 import com.snowflake_guide.tourmate.domain.baggage_storage.dto.BaggageStorageResponseDto;
 import com.snowflake_guide.tourmate.domain.baggage_storage.entity.BaggageStorage;
 import com.snowflake_guide.tourmate.domain.baggage_storage.repository.BaggageStorageRepository;
@@ -22,6 +23,10 @@ public class GetBaggageService {
     // 모든 수하물을 반환하되 parentName을 기준으로 첫 번째 요소만 반환
     public List<BaggageStorageResponseDto> getAllBaggageStorageDetails() {
         return baggageStorageRepository.findAllGroupedByParentName();
+    }
+
+    public List<BaggageStorageDetailResponseDto> getBaggageStoragesByStationName(String stationName) {
+        return baggageStorageRepository.findByParentName(stationName);
     }
 }
 

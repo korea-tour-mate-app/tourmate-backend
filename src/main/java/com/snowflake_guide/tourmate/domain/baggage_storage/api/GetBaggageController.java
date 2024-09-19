@@ -1,10 +1,12 @@
 package com.snowflake_guide.tourmate.domain.baggage_storage.api;
 
+import com.snowflake_guide.tourmate.domain.baggage_storage.dto.BaggageStorageDetailResponseDto;
 import com.snowflake_guide.tourmate.domain.baggage_storage.dto.BaggageStorageResponseDto;
 import com.snowflake_guide.tourmate.domain.baggage_storage.service.GetBaggageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,5 +25,10 @@ public class GetBaggageController {
     @GetMapping("/all-grouped")
     public List<BaggageStorageResponseDto> getAllGroupedBaggageStorageDetails() {
         return getBaggageService.getAllBaggageStorageDetails();
+    }
+
+    @GetMapping("/station/{stationName}")
+    public List<BaggageStorageDetailResponseDto> getBaggageStoragesByStationName(@PathVariable String stationName) {
+        return getBaggageService.getBaggageStoragesByStationName(stationName);
     }
 }
