@@ -1,6 +1,6 @@
 package com.snowflake_guide.tourmate.global.google_api.service;
 
-import com.snowflake_guide.tourmate.domain.RestaurantReview.service.RestaurantReviewService;
+import com.snowflake_guide.tourmate.domain.restaurant_review.service.RestaurantReviewService;
 import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
 import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceReviewClient;
@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,12 +35,17 @@ public class GoogleDetailsService {
         }
 
         // Google Places API를 사용하여 리뷰 정보 가져오기
-        GooglePlaceDetailsResponseDto responseDto = googlePlaceReviewClient.getPlaceReviews(placeId, apiKey);
+        GooglePlaceDetailsResponseDto responseDto = googlePlaceReviewClient.getPlaceReviews(placeId, apiKey, "ko");  // 한글로 응답을 받기 위한 language 파라미터
 
         // 리뷰 정보를 변환한 RestaurantReviewResponseDto 반환
         RestaurantReviewResponseDto restaurantReviewResponseDto = new RestaurantReviewResponseDto();
         restaurantReviewResponseDto.setFormatted_phone_number(responseDto.getResult().getFormatted_phone_number());
         restaurantReviewResponseDto.setWeekday_text(responseDto.getResult().getOpening_hours().getWeekday_text());
+
+        // 리뷰 리스트 초기화 확인 및 설정
+        if (restaurantReviewResponseDto.getReviews() == null) {
+            restaurantReviewResponseDto.setReviews(new ArrayList<>()); // 리스트 초기화
+        }
 
         List<GooglePlaceDetailsResponseDto.Review> reviews = responseDto.getResult().getReviews();
         reviews.forEach(review -> {

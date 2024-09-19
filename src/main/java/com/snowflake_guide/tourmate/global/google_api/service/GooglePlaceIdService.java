@@ -70,12 +70,14 @@ public class GooglePlaceIdService {
 
         log.info("현재까지 저장된 DTO 개수: {}", placeDetailResults.size());
 
-        // 모아둔 레스토랑 리스트를 한 번에 저장
-        restaurantService.saveAllRestaurants(placeDetailResults);
-
         // placeDetailResults와 next_page_token 설정
         restaurantResponseDto.setPlaceDetailResults(placeDetailResults);
         restaurantResponseDto.setNext_page_token(topRestaurants.getNext_page_token());
+        log.info("next token은?: {}", topRestaurants.getNext_page_token());
+
+
+        // 모아둔 레스토랑 리스트를 한 번에 저장
+        restaurantService.saveAllRestaurants(restaurantResponseDto);
 
         // 응답 반환
         return new ResponseEntity<>(restaurantResponseDto, HttpStatus.OK);

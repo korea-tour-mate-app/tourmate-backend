@@ -20,6 +20,8 @@ public class Restaurant {
     private Long restaurantId;
 
     private String name; // 장소 이름
+
+    @Column(length = 1000) // 길이를 늘려서 오류 방지
     private String formattedAddress; // 주소
     private double latitude; // 위도
     private double longitude; // 경도
@@ -28,9 +30,9 @@ public class Restaurant {
     private String reference; // 참조값
     private double rating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
+    private String nextPageToken; // 장소 요청하는 다음 토큰
     private String formattedPhoneNumber; // 전화번호
     private String weekdayText; // 요일별 영업시간 텍스트
-
     public void setFormattedPhoneNumber(String formattedPhoneNumber) {
         this.formattedPhoneNumber = formattedPhoneNumber;
     }

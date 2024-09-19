@@ -16,11 +16,16 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
 
     @Transactional
-    public void saveAllRestaurants(List<RestaurantResponseDto.PlaceDetailResult> list) {
+    public void saveAllRestaurants(RestaurantResponseDto restaurantResponseDto) {
+        List<RestaurantResponseDto.PlaceDetailResult> list = restaurantResponseDto.getPlaceDetailResults();
+        String nextPageToken = restaurantResponseDto.getNext_page_token();
         List<Restaurant> restaurants = new ArrayList<>();
 
-        for (RestaurantResponseDto.PlaceDetailResult result : list) {
-            Restaurant restaurant = Restaurant.builder()
+        for (int i = 0; i < list.size(); i++) {
+            RestaurantResponseDto.PlaceDetailResult result = list.get(i);
+
+            // 첫 번째 PlaceDetailResult인 경우에만 nextPageToken 설정
+            Restaurant.RestaurantBuilder builder = Restaurant.builder()
                     .name(result.getName())
                     .formattedAddress(result.getFormattedAddress())
                     .latitude(result.getLatitude())
@@ -29,9 +34,12 @@ public class RestaurantService {
                     .priceLevel(result.getPriceLevel())
                     .reference(result.getReference())
                     .userRatingsTotal(result.getUserRatingsTotal())
-                    .rating(result.getRating())
-                    .build();
+                    .rating(result.getRating());
 
+            if (i == 0) { // 첫 번째 요소인 경우 nextPageToken 추가
+                builder.nextPageToken(nextPageToken);
+            }
+            Restaurant restaurant = builder.build();
             restaurants.add(restaurant); // 리스트에 레스토랑 추가
         }
 

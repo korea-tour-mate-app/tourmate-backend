@@ -11,6 +11,7 @@ public interface GooglePlaceReviewClient {
     @GetMapping("/details/json")
     GooglePlaceDetailsResponseDto getPlaceReviews(
             @RequestParam("place_id") String placeId,
-            @RequestParam("key") String apiKey
+            @RequestParam("key") String apiKey,
+            @RequestParam("language") String language
     );
 }

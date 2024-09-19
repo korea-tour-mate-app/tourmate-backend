@@ -3,6 +3,7 @@ package com.snowflake_guide.tourmate.global.google_api.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -10,7 +11,7 @@ import java.util.List;
 public class RestaurantReviewResponseDto {
     private String formatted_phone_number; // 전화번호
     private List<String> weekday_text; // 요일별 영업시간 텍스트
-    private List<Review> reviews; // 리뷰 목록
+    private List<Review> reviews = new ArrayList<>(); // ArrayList로 초기화
 
     @Override
     public String toString() {

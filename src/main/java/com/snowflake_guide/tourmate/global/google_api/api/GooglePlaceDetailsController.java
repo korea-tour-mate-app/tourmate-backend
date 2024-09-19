@@ -2,7 +2,6 @@ package com.snowflake_guide.tourmate.global.google_api.api;
 
 import com.snowflake_guide.tourmate.global.google_api.dto.RestaurantReviewResponseDto;
 import com.snowflake_guide.tourmate.global.google_api.service.GoogleDetailsService;
-import com.snowflake_guide.tourmate.global.google_api.service.GooglePlaceIdService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,8 @@ public class GooglePlaceDetailsController {
     private final GoogleDetailsService googleDetailsService;
 
     @PostMapping("/getRestaurantReviews")
-    public ResponseEntity<RestaurantReviewResponseDto> getRestaurantReviews(@RequestParam String placeId) {
+    public RestaurantReviewResponseDto getRestaurantReviews(@RequestParam String placeId) {
         // 서비스 호출 후 ResponseEntity로 반환
-        RestaurantReviewResponseDto responseDto = googleDetailsService.getRestaurantReviews(placeId);
-        return ResponseEntity.ok(responseDto);
+        return googleDetailsService.getRestaurantReviews(placeId);
     }
 }
