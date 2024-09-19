@@ -1,7 +1,7 @@
 package com.snowflake_guide.tourmate.domain.baggage_storage.service;
 
 import com.snowflake_guide.tourmate.domain.baggage_storage.entity.BaggageStorage;
-import com.snowflake_guide.tourmate.domain.baggage_storage.repository.BaggageRepository;
+import com.snowflake_guide.tourmate.domain.baggage_storage.repository.BaggageStorageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,8 +16,8 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BaggageService {
-    private final BaggageRepository baggageRepository; // 'final' 키워드 추가
+public class UploadBaggageService {
+    private final BaggageStorageRepository baggageStorageRepository; // 'final' 키워드 추가
 
     public void saveBaggageFromCSV(String filePath) throws IOException, CsvValidationException {
         List<BaggageStorage> baggages = new ArrayList<>();
@@ -56,7 +56,7 @@ public class BaggageService {
                 baggages.add(baggage);
             }
         }
-        baggageRepository.saveAll(baggages);
+        baggageStorageRepository.saveAll(baggages);
     }
     // 문자열을 파싱하여 Integer로 변환, 빈 문자열일 경우 기본값 반환
     private int parseIntOrDefault(String value, int defaultValue) {

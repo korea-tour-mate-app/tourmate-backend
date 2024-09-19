@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class BaggageStorage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long baggage_storage_id;
+    private Long baggageStorageId;
+
     private int lineNumber;
     private String lockerName;
     private String lockerDetail;
