@@ -9,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     Restaurant findByPlaceId(String placeId); // placeId로 레스토랑 찾기
 

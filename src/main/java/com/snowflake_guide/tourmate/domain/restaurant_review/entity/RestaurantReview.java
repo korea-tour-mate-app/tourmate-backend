@@ -19,6 +19,8 @@ public class RestaurantReview {
 
     private String authorName; // 작성자 이름
     private String language; // 언어
+
+    @Column(columnDefinition = "double precision default 0.0") // 기본값 0.0 설정
     private double reviewRating; // 별점
     private String relativeTimeDescription; // 상대적 시간
 

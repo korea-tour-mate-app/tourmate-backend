@@ -35,10 +35,12 @@ public class Restaurant {
 
     @Column(length = 1000)
     private String reference; // 참조값
+
+    @Column(columnDefinition = "double precision default 0.0") // 기본값 0.0 설정
     private double totalRating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
 
-    @Column(length = 3000)
+    @Column(length = 3000) // 길이를 늘려서 오류 방지
     private String nextPageToken; // 장소 요청하는 다음 토큰
 
     @Column(length = 500)
