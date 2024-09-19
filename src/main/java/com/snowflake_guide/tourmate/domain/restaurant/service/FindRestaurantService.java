@@ -56,7 +56,7 @@ public class FindRestaurantService {
     }
 
     // 특정 장소 주변에 있는 음식점 3개 조회
-    public FindRestaurantsResponseDto getRestaurantPlaceId(FindRestaurantsRequestDto findRestaurantsRequestDto) {
+    public FindRestaurantsResponseDto findRestaurantPlaceId(FindRestaurantsRequestDto findRestaurantsRequestDto) {
         List<FindRestaurantsResponseDto.LocationWithRestaurants> results = new ArrayList<>();
         Set<Long> excludedRestaurantIds = new HashSet<>(); // 중복을 방지하기 위한 Set
 
