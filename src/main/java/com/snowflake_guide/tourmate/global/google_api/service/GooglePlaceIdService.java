@@ -1,6 +1,6 @@
 package com.snowflake_guide.tourmate.global.google_api.service;
 
-import com.snowflake_guide.tourmate.domain.restaurant.service.RestaurantService;
+import com.snowflake_guide.tourmate.domain.restaurant.service.FindRestaurantService;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceIdClient;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlacesAPIResponseDto;
 import com.snowflake_guide.tourmate.global.google_api.dto.RestaurantResponseDto;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class GooglePlaceIdService {
     private final GooglePlaceIdClient googlePlaceIdClient;
-    private final RestaurantService restaurantService;
+    private final FindRestaurantService findRestaurantService;
 
     @Value("${google.api.key}")
     private String apiKey;
@@ -28,10 +28,10 @@ public class GooglePlaceIdService {
     public ResponseEntity<?> getTopRestaurantPlaces() {
         // Google Places API 호출
         GooglePlacesAPIResponseDto topRestaurants = googlePlaceIdClient.getTopRestaurants(
-                "서울 음식점", // query parameter
-                "restaurant", // type
-                "prominence", // rankby
-                apiKey, // API key
+                "서울 음식점", // 검색어
+                "restaurant", // 장소 타입
+                "prominence", // 정렬 기준
+                apiKey,
                 "ko" // 한국어로 결과 요청
         );
 
@@ -77,7 +77,7 @@ public class GooglePlaceIdService {
 
 
         // 모아둔 레스토랑 리스트를 한 번에 저장
-        restaurantService.saveAllRestaurants(restaurantResponseDto);
+        findRestaurantService.saveAllRestaurants(restaurantResponseDto);
 
         // 응답 반환
         return new ResponseEntity<>(restaurantResponseDto, HttpStatus.OK);
