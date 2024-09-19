@@ -28,8 +28,12 @@ public class Restaurant {
     private String placeId; // 장소 ID
     private int priceLevel; // 가격 수준
     private String reference; // 참조값
+
+    @Column(columnDefinition = "double precision default 0.0") // 기본값 0.0 설정
     private double rating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
+
+    @Column(length = 1000) // 길이를 늘려서 오류 방지
     private String nextPageToken; // 장소 요청하는 다음 토큰
     private String formattedPhoneNumber; // 전화번호
     private String weekdayText; // 요일별 영업시간 텍스트
