@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
@@ -31,4 +32,8 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
             @Param("maxLongitude") double maxLongitude,
             @Param("excludedRestaurantIds") Set<Long> excludedRestaurantIds,
             Pageable pageable);
+
+    // restaurantId로 레스토랑 정보 조회
+    @Query("SELECT r FROM Restaurant r LEFT JOIN FETCH r.reviews WHERE r.restaurantId = :restaurantId")
+    Optional<Restaurant> findByRestaurantIdWithReviews(@Param("restaurantId") Long restaurantId);
 }
