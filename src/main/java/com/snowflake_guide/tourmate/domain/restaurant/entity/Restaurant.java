@@ -24,17 +24,27 @@ public class Restaurant {
 
     private String name; // 장소 이름
 
-    @Column(length = 1000) // 길이를 늘려서 오류 방지
+    @Column(length = 1000)
     private String formattedAddress; // 주소
     private double latitude; // 위도
     private double longitude; // 경도
+
+    @Column(length = 1000)
     private String placeId; // 장소 ID
     private int priceLevel; // 가격 수준
+
+    @Column(length = 1000)
     private String reference; // 참조값
     private double totalRating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
+
+    @Column(length = 3000)
     private String nextPageToken; // 장소 요청하는 다음 토큰
+
+    @Column(length = 500)
     private String formattedPhoneNumber; // 전화번호
+
+    @Column(length = 2000)
     private String weekdayText; // 요일별 영업시간 텍스트
     public void setFormattedPhoneNumber(String formattedPhoneNumber) {
         this.formattedPhoneNumber = formattedPhoneNumber;
