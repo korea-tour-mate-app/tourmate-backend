@@ -33,13 +33,18 @@ public class Place extends BaseTimeEntity {
     @Column(nullable = false)
     private String placeName; // 여행지
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 300)
     private String placeLocation; // 주소
 
+    @Column(nullable = false, length = 300)
     private String imageUrl1; // 장소 이미지1
     private String imageUrl2; // 장소 이미지2
     private String imageUrl3; // 장소 이미지3
     private String startEndTime; // 영업시간(영업 시작 ~ 종료시간)
+
+    @Column(nullable = false, length = 300)
+    private String homepageUrl; // 홈페이지 주소
+
     private String deadlineTime; // 입장마감 시간
     private String placeCost; // 입장료
     private String checkInOutTime; // 체크인, 체크아웃시간
@@ -47,8 +52,9 @@ public class Place extends BaseTimeEntity {
     private String dayOff; // 휴무일
     private String duringTime; // 관람시간
 //    private String stayInCost; // 하루숙박료
+
+
     private int templateStayType; // 템플스테이유형
-    private String homepageUrl; // 홈페이지 주소
     private Float avgCost; // 평균 가격
     private int veganType; // 비건유형
     private int foodType; // 음식유형
