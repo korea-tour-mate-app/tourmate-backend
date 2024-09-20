@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThemePlacesResponseDto {
+public class GetPlacesByThemeResponseDto {
 
     private Long themeId;
     private String placeTheme;
