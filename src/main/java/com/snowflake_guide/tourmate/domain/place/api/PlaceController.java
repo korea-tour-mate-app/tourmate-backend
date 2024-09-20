@@ -21,7 +21,7 @@ public class PlaceController {
     private final PlaceService placeService;
 
     @GetMapping("/{placeTheme}/places")
-    public ResponseEntity<GetPlacesByThemeResponseDto> getPlacesByTheme(@PathVariable String placeTheme) {
+    public ResponseEntity<GetPlacesByThemeResponseDto> getPlacesByTheme(@PathVariable(required = false) String placeTheme) {
         GetPlacesByThemeResponseDto response = placeService.getPlacesByTheme(placeTheme);
         return ResponseEntity.ok(response);
     }
