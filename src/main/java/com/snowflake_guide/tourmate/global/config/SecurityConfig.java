@@ -20,6 +20,23 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    private static final String[] AUTH_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/api/auth/signup",
+            "/api/auth/login",
+            "/api/auth/google-login",
+            "/api/s3/test",
+            "/api/place/{placeId}/reviews",
+            "/api/tmap/optimize-route",
+            "/api/google-api/getTopRestaurantPlaces",
+            "/api/google-api/getRestaurantReviews",
+            "/api/restaurants/**",
+            "/api/baggage/**",
+            "/api/themes/**"
+    };
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -30,8 +47,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll() // Swagger UI와 API 문서에 대한 접근 허용
-                                .requestMatchers("/api/auth/**", "/api/s3/test", "/api/place/{placeId}/reviews", "/api/google-api/getTopRestaurantPlaces","/api/google-api/getRestaurantReviews", "/api/restaurants/**", "/api/baggage/**", "/api/themes/**").permitAll() // /api/auth/signup URL에 대한 접근 허용
+                                .requestMatchers(AUTH_WHITELIST).permitAll()
                                 .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
