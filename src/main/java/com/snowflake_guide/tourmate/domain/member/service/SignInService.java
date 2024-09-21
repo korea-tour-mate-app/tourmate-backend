@@ -24,8 +24,6 @@ public class SignInService {
     }
 
     public SignInResponseDTO login(SignInRequestDTO signInRequestDTO) {
-        System.out.println("SignInRequestDTOEmail: " + signInRequestDTO.getEmail_signIn());
-        System.out.println("SignInRequestDTOPassword: " + signInRequestDTO.getPassword_signIn());
         Member member = memberRepository.findByEmail(signInRequestDTO.getEmail_signIn())
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 이메일 또는 비밀번호입니다."));
 
