@@ -3,28 +3,37 @@ package com.snowflake_guide.tourmate.domain.member.service;
 import com.snowflake_guide.tourmate.domain.member.dto.SignUpRequestDTO;
 import com.snowflake_guide.tourmate.domain.member.entity.Member;
 import com.snowflake_guide.tourmate.domain.member.repository.MemberRepository;
+import com.snowflake_guide.tourmate.global.auth.email.service.EmailService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SignUpService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    @Autowired
-    public SignUpService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
+    @Transactional
     public Member signUp(SignUpRequestDTO signUpRequestDTO) {
+        // 이메일 인증 여부 확인
+        if (!emailService.isEmailVerified(signUpRequestDTO.getEmail())) {
+            throw new RuntimeException("이메일 인증을 먼저 시도해주세요.");
+        }
+
         validatePassword(signUpRequestDTO.getPassword());
 
         Member member = new Member();
-        member.setName(signUpRequestDTO.getName());
+        member.setNickname(signUpRequestDTO.getNickname());
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signUpRequestDTO.getPassword());
@@ -43,5 +52,8 @@ public class SignUpService {
 
     public boolean existsByEmail(String email) {
         return memberRepository.existsByEmail(email);
+    }
+    public boolean existsByNickname(String email) {
+        return memberRepository.existsByNickname(email);
     }
 }

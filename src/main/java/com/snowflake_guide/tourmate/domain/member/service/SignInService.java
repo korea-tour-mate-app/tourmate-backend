@@ -24,11 +24,11 @@ public class SignInService {
     }
 
     public SignInResponseDTO login(SignInRequestDTO signInRequestDTO) {
-        Member member = memberRepository.findByEmail(signInRequestDTO.getEmail())
+        Member member = memberRepository.findByEmail(signInRequestDTO.getEmail_signIn())
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 이메일 또는 비밀번호입니다."));
 
-        if (!passwordEncoder.matches(signInRequestDTO.getPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("잘못된 이메일 또는 비밀번호입니다.");
+        if (!passwordEncoder.matches(signInRequestDTO.getPassword_signIn(), member.getPassword())) {
+            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
 
         String accessToken = jwtTokenProvider.generateAccessToken(member.getEmail());

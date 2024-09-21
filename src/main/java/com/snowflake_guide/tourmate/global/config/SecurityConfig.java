@@ -27,11 +27,15 @@ public class SecurityConfig {
             "/webjars/**",
             "/api/auth/signup",
             "/api/auth/login",
+            "/api/auth/google-login",
             "/api/s3/test",
             "/api/place/{placeId}/reviews",
-            "/api/auth/google-login",
             "/api/tmap/optimize-route",
-            "/api/google-map/optimize-route/**"
+            "/api/google-api/getTopRestaurantPlaces",
+            "/api/google-api/getRestaurantReviews",
+            "/api/restaurants/**",
+            "/api/baggage/**",
+            "/api/themes/**"
     };
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -44,8 +48,6 @@ public class SecurityConfig {
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
-//                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll() // Swagger UI와 API 문서에 대한 접근 허용
-//                                .requestMatchers("/api/auth/signup","/api/auth/login", "/api/s3/test", "/api/place/{placeId}/reviews", "/api/auth/google-login", "/api/tmap/optimize-route").permitAll() // /api/auth/signup URL에 대한 접근 허용
                                 .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

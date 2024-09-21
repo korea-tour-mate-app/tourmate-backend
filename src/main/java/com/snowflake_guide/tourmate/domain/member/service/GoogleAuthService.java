@@ -36,7 +36,7 @@ public class GoogleAuthService {
                 log.info("새로운 회원을 생성합니다: {}", googleUser.getEmail());
                 member = Member.builder()
                         .email(googleUser.getEmail())
-                        .name(googleUser.getName())
+                        .nickname(googleUser.getName())
                         .password("") // 구글 소셜 로그인 사용자는 비밀번호가 없으므로 빈 값으로 설정
                         .build();
                 memberRepository.save(member); // 회원 저장 로직

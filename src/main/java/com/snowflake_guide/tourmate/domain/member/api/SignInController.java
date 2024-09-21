@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "SingIn API", description = "자체 로그인하는 API")
+@Tag(name = "SignIn API", description = "자체 로그인하는 API")
 @RestController
 @RequestMapping("/api/auth/login")
 public class SignInController {
