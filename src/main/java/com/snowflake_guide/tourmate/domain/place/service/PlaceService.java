@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +26,7 @@ public class PlaceService {
 
         List<Place> places;
 
-        if (placeTheme == null || placeTheme.trim().isEmpty()) {
+        if (Objects.equals(placeTheme, "default") || placeTheme == null || placeTheme.trim().isEmpty()) {
             // placeTheme이 비어있으면 모든 장소를 조회
             places = placeRepository.findAll();
             log.info("모든 장소를 반환합니다.");

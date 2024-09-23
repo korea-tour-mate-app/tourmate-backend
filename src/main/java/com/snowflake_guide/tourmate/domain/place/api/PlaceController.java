@@ -20,8 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlaceController {
     private final PlaceService placeService;
 
-    @GetMapping("/{placeTheme}/places")
-    public ResponseEntity<GetPlacesByThemeResponseDto> getPlacesByTheme(@PathVariable(required = false) String placeTheme) {
+    @GetMapping({"/{placeTheme}/places", "/places"})
+    public ResponseEntity<GetPlacesByThemeResponseDto> getPlacesByTheme(
+            @PathVariable(required = false) String placeTheme) {
+        if (placeTheme == null) {
+            placeTheme = "default"; // 기본값 설정
+        }
         GetPlacesByThemeResponseDto response = placeService.getPlacesByTheme(placeTheme);
         return ResponseEntity.ok(response);
     }
