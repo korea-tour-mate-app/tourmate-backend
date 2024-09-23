@@ -1,16 +1,15 @@
 package com.snowflake_guide.tourmate.domain.restaurant.dto;
 
-import com.snowflake_guide.tourmate.global.google_api.dto.RestaurantReviewResponseDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Builder
 public class FindRestaurantDetailsResponseDto {
-    private Long restaurantId;
+    private Long restaurantId; // 식당 ID
+    private String restaurantName; // 식당 이름
     private int priceLevel; // 가격 수준
     private double totalRating; // 총 리뷰값
     private int userRatingsTotal; // 리뷰 수
