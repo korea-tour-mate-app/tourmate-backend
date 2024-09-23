@@ -40,8 +40,8 @@ public class Restaurant {
     private double totalRating; // 리뷰값
     private int userRatingsTotal; // 리뷰 수
 
-    @Column(length = 3000) // 길이를 늘려서 오류 방지
-    private String nextPageToken; // 장소 요청하는 다음 토큰
+//    @Column(length = 3000) // 길이를 늘려서 오류 방지
+//    private String nextPageToken; // 장소 요청하는 다음 토큰
 
     @Column(length = 500)
     private String formattedPhoneNumber; // 전화번호

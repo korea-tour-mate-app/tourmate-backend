@@ -11,9 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,61 +24,106 @@ public class GooglePlaceIdService {
     @Value("${google.api.key}")
     private String apiKey;
 
-    public ResponseEntity<?> getTopRestaurantPlaces() {
-        // Google Places API 호출
-        GooglePlacesAPIResponseDto topRestaurants = googlePlaceIdClient.getTopRestaurants(
-                "서울 음식점", // 검색어
-                "restaurant", // 장소 타입
-                "prominence", // 정렬 기준
-                apiKey,
-                "ko" // 한국어로 결과 요청
-        );
 
-        // 응답이 성공적이지 않을 경우 에러 메시지 반환
-        if (!Objects.equals(topRestaurants.getStatus(), "OK")) {
-            return new ResponseEntity<>("응답이 성공되지 못했습니다.", HttpStatus.OK);
+    // 구별 필요한 데이터 수를 설정
+    private static final Map<String, Integer> REQUIRED_DATA = new HashMap<>() {{
+        put("중구", 52);
+        put("강남구", 52);
+        put("용산구", 52);
+        put("종로구", 52);
+        put("서초구", 42);
+        put("영등포구", 42);
+        put("마포구", 42);
+        put("성동구", 42);
+        put("성북구", 42);
+        put("광진구", 42);
+        put("송파구", 42);
+        // 나머지 구는 12개씩
+        put("강동구", 12);
+        put("강북구", 12);
+        put("강서구", 12);
+        put("관악구", 12);
+        put("구로구", 12);
+        put("금천구", 12);
+        put("노원구", 12);
+        put("도봉구", 12);
+        put("동대문구", 12);
+        put("동작구", 12);
+        put("서대문구", 12);
+        put("양천구", 12);
+        put("은평구", 12);
+        put("중랑구", 12);
+    }};
+
+    public ResponseEntity<?> getAllRestaurantPlaces() {
+        // 모든 구에 대해 데이터를 수집
+        for (Map.Entry<String, Integer> entry : REQUIRED_DATA.entrySet()) {
+            String district = entry.getKey();
+            int requiredCount = entry.getValue();
+
+            getRestaurantsForDistrict(district, requiredCount);
         }
 
-        // GoogleRestaurantResponseDto 객체 생성
-        RestaurantResponseDto restaurantResponseDto = new RestaurantResponseDto();
-        List<RestaurantResponseDto.PlaceDetailResult> placeDetailResults = new ArrayList<>();
+        return new ResponseEntity<>("모든 구의 데이터 수집 완료", HttpStatus.OK);
+    }
+    private void getRestaurantsForDistrict(String district, int requiredCount) {
+        String pageToken = null;
+        List<RestaurantResponseDto.PlaceDetailResult> allRestaurants = new ArrayList<>();
 
-        // 응답을 변환해서 placeDetailResults에 저장
-        topRestaurants.getResults().forEach(result -> {
-            RestaurantResponseDto.PlaceDetailResult dto = new RestaurantResponseDto.PlaceDetailResult();
-            dto.setFormattedAddress(result.getFormatted_address());
-            if (result.getFormatted_address().contains("서울")) {
-                // 서울에 있는 경우에만 리스트에 추가
-                dto.setName(result.getName());
-                dto.setLatitude(result.getGeometry().getLocation().getLat());
-                dto.setLongitude(result.getGeometry().getLocation().getLng());
-                dto.setPlaceId(result.getPlace_id());
-                dto.setPriceLevel(result.getPrice_level());
-                dto.setReference(result.getReference());
-                dto.setRating(result.getRating());
-                dto.setUserRatingsTotal(result.getUser_ratings_total());
+        do {
+            GooglePlacesAPIResponseDto response = googlePlaceIdClient.getTopRestaurants(
+                    district + " 음식점",
+                    "restaurant",
+                    "prominence",
+                    apiKey,
+                    "ko",
+                    pageToken
+            );
 
-                // dto에 저장
-                placeDetailResults.add(dto);
-
-                log.info("Restaurant DTO: {}", dto.toString());
-            } else {
-                log.info("서울이 아닌 주소이므로 저장을 하지 않습니다.: {}", dto.getFormattedAddress());
+            if (!Objects.equals(response.getStatus(), "OK")) {
+                log.error("API 호출 실패: 구 = {}, 메시지 = {}", district, response.getStatus());
+                break;
             }
-        });
 
-        log.info("현재까지 저장된 DTO 개수: {}", placeDetailResults.size());
+            List<RestaurantResponseDto.PlaceDetailResult> currentResults = response.getResults().stream()
+                    .filter(result -> result.getFormatted_address().contains("서울"))
+                    .map(result -> {
+                        RestaurantResponseDto.PlaceDetailResult dto = new RestaurantResponseDto.PlaceDetailResult();
+                        dto.setFormattedAddress(result.getFormatted_address());
+                        dto.setName(result.getName());
+                        dto.setLatitude(result.getGeometry().getLocation().getLat());
+                        dto.setLongitude(result.getGeometry().getLocation().getLng());
+                        dto.setPlaceId(result.getPlace_id());
+                        dto.setPriceLevel(result.getPrice_level());
+                        dto.setReference(result.getReference());
+                        dto.setRating(result.getRating());
+                        dto.setUserRatingsTotal(result.getUser_ratings_total());
+                        return dto;
+                    }).toList();
 
-        // placeDetailResults와 next_page_token 설정
-        restaurantResponseDto.setPlaceDetailResults(placeDetailResults);
-        restaurantResponseDto.setNext_page_token(topRestaurants.getNext_page_token());
-        log.info("next token은?: {}", topRestaurants.getNext_page_token());
+            allRestaurants.addAll(currentResults);
 
+            // 다음 페이지 토큰 갱신
+            pageToken = response.getNext_page_token();
 
-        // 모아둔 레스토랑 리스트를 한 번에 저장
-        findRestaurantService.saveAllRestaurants(restaurantResponseDto);
+            // API 사용 제한 때문에 지연을 추가
+            try {
+                if (pageToken != null) {
+                    Thread.sleep(2000); // 2초 지연
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
 
-        // 응답 반환
-        return new ResponseEntity<>(restaurantResponseDto, HttpStatus.OK);
+        } while (allRestaurants.size() < requiredCount && pageToken != null);
+
+        log.info("구: {}에서 수집된 데이터 수: {}", district, allRestaurants.size());
+
+        // 필요한 데이터 수만큼 수집한 경우에만 저장
+        if (allRestaurants.size() >= requiredCount) {
+            RestaurantResponseDto restaurantResponseDto = new RestaurantResponseDto();
+            restaurantResponseDto.setPlaceDetailResults(allRestaurants);
+            findRestaurantService.saveAllRestaurants(restaurantResponseDto);
+        }
     }
 }

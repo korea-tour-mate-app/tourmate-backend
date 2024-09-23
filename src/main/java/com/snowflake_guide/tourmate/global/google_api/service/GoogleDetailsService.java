@@ -1,8 +1,8 @@
 package com.snowflake_guide.tourmate.global.google_api.service;
 
-import com.snowflake_guide.tourmate.domain.restaurant_review.service.RestaurantReviewService;
 import com.snowflake_guide.tourmate.domain.restaurant.entity.Restaurant;
 import com.snowflake_guide.tourmate.domain.restaurant.repository.RestaurantRepository;
+import com.snowflake_guide.tourmate.domain.restaurant_review.service.RestaurantReviewService;
 import com.snowflake_guide.tourmate.global.client.GooglePlaceReviewClient;
 import com.snowflake_guide.tourmate.global.google_api.dto.GooglePlaceDetailsResponseDto;
 import com.snowflake_guide.tourmate.global.google_api.dto.RestaurantReviewResponseDto;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,18 +25,35 @@ public class GoogleDetailsService {
     @Value("${google.api.key}")
     private String apiKey;
 
-    public RestaurantReviewResponseDto getRestaurantReviews(String placeId) {
-        // 해당 placeId로 Restaurant 정보 가져오기
-        Restaurant restaurant = restaurantRepository.findByPlaceId(placeId);
+    public void getRestaurantReviews(int startId, int endId) {
+        // restaurantId가 1부터 499까지의 레스토랑을 가져옵니다.
+        for (long restaurantId = startId; restaurantId <= endId; restaurantId++) {
+            try {
+                // 레스토랑 엔티티 가져오기
+                long finalRestaurantId = restaurantId;
+                Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                        .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + finalRestaurantId));
 
-        if (Objects.isNull(restaurant)) {
-            throw new RuntimeException("Restaurant not found with placeId: " + placeId);
+                // Google Details API를 호출하여 리뷰 가져오기
+                String placeId = restaurant.getPlaceId();
+                GooglePlaceDetailsResponseDto responseDto = googlePlaceReviewClient.getPlaceReviews(placeId, apiKey, "ko");
+
+                // 리뷰 정보를 변환한 RestaurantReviewResponseDto 반환
+                RestaurantReviewResponseDto restaurantReviewResponseDto = getRestaurantReviewResponseDto(responseDto);
+
+                log.info("RestaurantReviewResponseDto: {}", restaurantReviewResponseDto.toString());
+
+                // 리뷰를 데이터베이스에 저장
+                restaurantReviewService.saveReviews(restaurant, restaurantReviewResponseDto);
+
+            } catch (Exception e) {
+                log.error("Failed to fetch reviews for Restaurant ID {}: {}", restaurantId, e.getMessage());
+            }
         }
+    }
 
-        // Google Details API를 사용하여 리뷰 정보 가져오기
-        GooglePlaceDetailsResponseDto responseDto = googlePlaceReviewClient.getPlaceReviews(placeId, apiKey, "ko");  // 한글로 응답을 받기 위한 language 파라미터
-
-        // 리뷰 정보를 변환한 RestaurantReviewResponseDto 반환
+    // 리뷰 정보를 변환하여 RestaurantReviewResponseDto를 반환하는 메서드
+    private RestaurantReviewResponseDto getRestaurantReviewResponseDto(GooglePlaceDetailsResponseDto responseDto) {
         RestaurantReviewResponseDto restaurantReviewResponseDto = new RestaurantReviewResponseDto();
         restaurantReviewResponseDto.setFormatted_phone_number(responseDto.getResult().getFormatted_phone_number());
         restaurantReviewResponseDto.setWeekday_text(responseDto.getResult().getOpening_hours().getWeekday_text());
@@ -60,11 +76,6 @@ public class GoogleDetailsService {
             // 리뷰 정보를 restaurantReviewResponseDto에 추가
             restaurantReviewResponseDto.getReviews().add(reviewDto);
         });
-
-        log.info("RestaurantReviewResponseDto: {}", restaurantReviewResponseDto.toString());
-
-        restaurantReviewService.saveReviews(restaurant, restaurantReviewResponseDto);
-        // 변환된 리뷰 정보 및 전화번호, 영업시간 정보를 포함한 DTO 반환
 
         return restaurantReviewResponseDto;
     }

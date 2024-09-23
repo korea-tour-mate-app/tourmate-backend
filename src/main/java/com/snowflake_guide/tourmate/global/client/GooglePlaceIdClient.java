@@ -13,6 +13,7 @@ public interface GooglePlaceIdClient {
             @RequestParam("type") String type,
             @RequestParam("rankby") String rankBy,
             @RequestParam("key") String apiKey,
-            @RequestParam("language") String language
+            @RequestParam("language") String language,
+            @RequestParam(value = "pagetoken", required = false) String pageToken // 추가
     );
 }

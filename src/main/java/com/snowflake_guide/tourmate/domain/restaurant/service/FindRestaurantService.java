@@ -44,9 +44,6 @@ public class FindRestaurantService {
                     .userRatingsTotal(result.getUserRatingsTotal())
                     .totalRating(result.getRating());
 
-            if (i == 0) { // 첫 번째 요소인 경우 nextPageToken 추가
-                builder.nextPageToken(nextPageToken);
-            }
             Restaurant restaurant = builder.build();
             restaurants.add(restaurant); // 리스트에 레스토랑 추가
         }
