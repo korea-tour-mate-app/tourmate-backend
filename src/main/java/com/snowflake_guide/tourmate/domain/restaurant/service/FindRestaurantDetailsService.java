@@ -29,6 +29,7 @@ public class FindRestaurantDetailsService {
 
         // 레스토랑 정보와 리뷰 정보를 포함하는 DTO 생성 및 반환
         return FindRestaurantDetailsResponseDto.builder()
+                .restaurantId(restaurantId)
                 .priceLevel(restaurant.getPriceLevel())
                 .totalRating(restaurant.getTotalRating())
                 .userRatingsTotal(restaurant.getUserRatingsTotal())

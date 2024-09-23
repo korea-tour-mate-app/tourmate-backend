@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 public class FindRestaurantDetailsResponseDto {
+    private Long restaurantId;
     private int priceLevel; // 가격 수준
     private double totalRating; // 총 리뷰값
     private int userRatingsTotal; // 리뷰 수
