@@ -37,10 +37,10 @@ public class ReviewController {
     private final Validator validator;
 
     @Operation(summary = "리뷰 등록", description = "지정된 방문지에 리뷰를 작성합니다.")
-    @PostMapping(value = "/{visitedPlaceId}/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{placeId}/review", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createReview(
             Authentication authentication,
-            @Parameter(description = "방문지 ID", example = "1") @PathVariable("visitedPlaceId") Long visitedPlaceId,
+            @Parameter(description = "장소 ID", example = "1") @PathVariable("placeId") Long placeId,
             @Parameter(description = "리뷰 내용 (reviewDec), 별점(rate)") @RequestPart(value = "reviewRequestDto", required = false) String reviewRequestDtoJson,
             @Parameter(description = "리뷰 이미지 파일들 (최대 3개)") @RequestPart(value = "reviewImages", required = false) MultipartFile[] reviewImages
     ) {
@@ -70,7 +70,7 @@ public class ReviewController {
 
         try {
             // 유효성 검사 통과 시, 리뷰 생성 로직 실행
-            reviewService.createReview(email, reviewRequestDto, visitedPlaceId, reviewImages);
+            reviewService.createReview(email, reviewRequestDto, placeId, reviewImages);
             return ResponseEntity.ok("리뷰가 성공적으로 등록되었습니다.");
         } catch (IllegalArgumentException e) {
             log.error("리뷰 생성 중 오류 발생: {}", e.getMessage());
@@ -106,11 +106,11 @@ public class ReviewController {
     @Operation(summary = "특정 장소에 대한 리뷰 조회", description = "특정 장소에 대한 리뷰를 조회하고, 현재 사용자가 방문한 장소인지 확인합니다.")
     @GetMapping("/place/{placeId}/reviews")
     public ResponseEntity<?> getReviewsByPlaceId(
-            @Parameter(description = "장소 ID", example = "1") @PathVariable("placeId") Long placeId,
-            @Parameter(description = "회원 ID", example = "1") @RequestParam("memberId") Long memberId) {
-
+            Authentication authentication,
+            @Parameter(description = "장소 ID", example = "1") @PathVariable("placeId") Long placeId) {
+        String email = authentication.getName();
         try {
-            PlaceReviewResponseDto response = reviewService.getReviewsByPlaceId(placeId, memberId);
+            PlaceReviewResponseDto response = reviewService.getReviewsByPlaceId(placeId, email);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.error("리뷰 조회 중 오류 발생: {}", e.getMessage());

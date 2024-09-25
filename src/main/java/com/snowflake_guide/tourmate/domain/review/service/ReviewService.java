@@ -29,7 +29,7 @@ public class ReviewService {
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
 
-    public void createReview(String email, ReviewRequestDto reviewRequestDto, Long visitedPlaceId, MultipartFile[] reviewImages) {
+    public void createReview(String email, ReviewRequestDto reviewRequestDto, Long placeId, MultipartFile[] reviewImages) {
         // S3에 이미지 업로드 (트랜잭션 외부에서 처리)
         List<String> imageUrls = new ArrayList<>();
         if (reviewImages != null) {
@@ -49,18 +49,21 @@ public class ReviewService {
         }
 
         // 리뷰 저장 트랜잭션 시작
-        saveReview(email, reviewRequestDto, visitedPlaceId, imageUrls);
+        saveReview(email, reviewRequestDto, placeId, imageUrls);
     }
 
     @Transactional
-    public void saveReview(String email, ReviewRequestDto reviewRequestDto, Long visitedPlaceId, List<String> imageUrls) {
+    public void saveReview(String email, ReviewRequestDto reviewRequestDto, Long placeId, List<String> imageUrls) {
         // 인증객체가 올바른지 확인
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다."));
 
-        // VisitedPlace 존재 여부 확인
-        VisitedPlace visitedPlace = visitedPlaceRepository.findById(visitedPlaceId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 방문한 장소가 존재하지 않습니다."));
+        VisitedPlace visitedPlace = visitedPlaceRepository.findByPlace_PlaceIdAndMember_Email(placeId, email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 장소에 대한 방문 기록이 존재하지 않습니다."));
+        Long visitedPlaceId = visitedPlace.getVisitedPlaceId();
+//        // VisitedPlace 존재 여부 확인
+//        VisitedPlace visitedPlace = visitedPlaceRepository.findById(visitedPlaceId)
+//                .orElseThrow(() -> new IllegalArgumentException("해당 방문한 장소가 존재하지 않습니다."));
 
         // VisitedPlace가 현재 회원의 것인지 확인
         if (!visitedPlace.getMember().getMemberId().equals(member.getMemberId())) {
@@ -114,7 +117,12 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceReviewResponseDto getReviewsByPlaceId(Long placeId, Long memberId) {
+    public PlaceReviewResponseDto getReviewsByPlaceId(Long placeId, String email) {
+        // 인증객체가 올바른지 확인
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다."));
+        Long memberId = member.getMemberId();
+
         // Place ID에 해당하는 VisitedPlace 목록을 가져옴
         List<VisitedPlace> visitedPlaces = visitedPlaceRepository.findByPlace_PlaceId(placeId);
 

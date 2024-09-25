@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlaceController {
     private final PlaceService placeService;
 
+    // 테마별 장소 리스트 반환
     @GetMapping({"/{placeTheme}/places", "/places"})
     public ResponseEntity<GetPlacesByThemeResponseDto> getPlacesByTheme(
             @PathVariable(required = false) String placeTheme) {
@@ -30,6 +31,7 @@ public class PlaceController {
         return ResponseEntity.ok(response);
     }
 
+    // 특정 장소의 상세정보 반환
     @GetMapping("/place/{placeId}")
     public ResponseEntity<GetPlaceByIdResponseDto> getPlaceById(@PathVariable Long placeId) {
         GetPlaceByIdResponseDto response = placeService.getPlaceById(placeId);

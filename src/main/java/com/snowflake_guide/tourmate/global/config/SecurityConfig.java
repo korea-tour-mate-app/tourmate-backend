@@ -34,7 +34,6 @@ public class SecurityConfig {
             "/api/auth/verify-email",
             "/api/auth/verify-code",
             "/api/s3/test",
-            "/api/place/{placeId}/reviews",
             "/api/tmap/optimize-route",
             "/api/google-api/**",
             "/api/restaurants/**",

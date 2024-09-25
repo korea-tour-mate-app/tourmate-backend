@@ -19,4 +19,6 @@ public interface VisitedPlaceRepository extends JpaRepository<VisitedPlace, Long
 
     // MyPlace ID와 Place ID로 VisitedPlace를 조회
     Optional<VisitedPlace> findByMember_MemberIdAndPlace_PlaceId(Long memberId, Long placeId);
+
+    Optional<VisitedPlace> findByPlace_PlaceIdAndMember_Email(Long placeId, String email);
 }
