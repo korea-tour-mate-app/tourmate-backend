@@ -126,7 +126,10 @@ public class ReviewService {
         // 리뷰 리스트 생성
         List<ReviewResponseDto> reviewList = visitedPlaces.stream()
                 .flatMap(visitedPlace -> visitedPlace.getReviews().stream())
-                .map(ReviewResponseDto::new)
+                .map(review -> {
+                    boolean isMyReview = review.getVisitedPlace().getMember().getMemberId().equals(memberId);
+                    return new ReviewResponseDto(review, isMyReview);
+                })
                 .toList();
         log.info("리뷰 조회 완료: 장소 ID = {}, 리뷰 수 = {}", placeId, reviewList.size());
         // 리뷰 리스트와 방문 여부를 포함한 응답 생성
