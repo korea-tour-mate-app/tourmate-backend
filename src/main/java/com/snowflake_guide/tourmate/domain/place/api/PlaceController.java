@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,8 +34,10 @@ public class PlaceController {
 
     // 특정 장소의 상세정보 반환
     @GetMapping("/place/{placeId}")
-    public ResponseEntity<GetPlaceByIdResponseDto> getPlaceById(@PathVariable Long placeId) {
-        GetPlaceByIdResponseDto response = placeService.getPlaceById(placeId);
+    public ResponseEntity<GetPlaceByIdResponseDto> getPlaceById(
+            Authentication authentication, @PathVariable Long placeId) {
+        String email = authentication.getName();
+        GetPlaceByIdResponseDto response = placeService.getPlaceById(placeId, email);
         return ResponseEntity.ok(response);
     }
 

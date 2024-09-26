@@ -1,9 +1,13 @@
 package com.snowflake_guide.tourmate.domain.place.service;
 
+import com.snowflake_guide.tourmate.domain.member.entity.Member;
+import com.snowflake_guide.tourmate.domain.member.repository.MemberRepository;
 import com.snowflake_guide.tourmate.domain.place.dto.GetPlaceByIdResponseDto;
 import com.snowflake_guide.tourmate.domain.place.dto.GetPlacesByThemeResponseDto;
 import com.snowflake_guide.tourmate.domain.place.entity.Place;
 import com.snowflake_guide.tourmate.domain.place.repository.PlaceRepository;
+import com.snowflake_guide.tourmate.domain.visited_place.entity.VisitedPlace;
+import com.snowflake_guide.tourmate.domain.visited_place.repository.VisitedPlaceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +25,8 @@ import java.util.stream.Collectors;
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
-
+    private final VisitedPlaceRepository visitedPlaceRepository;
+    private final MemberRepository memberRepository;
     public GetPlacesByThemeResponseDto getPlacesByTheme(String placeTheme) {
 
         List<Place> places;
@@ -55,12 +60,18 @@ public class PlaceService {
         return new GetPlacesByThemeResponseDto(themeId, placeTheme, placeDtos);
     }
 
-    public GetPlaceByIdResponseDto getPlaceById(Long placeId) {
+    public GetPlaceByIdResponseDto getPlaceById(Long placeId, String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다."));
+        boolean visited = visitedPlaceRepository.findByPlace_PlaceIdAndMember_Email(placeId, email).isPresent();
+
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> {
                     log.warn("해당 장소가 존재하지 않습니다: {}", placeId);
                     return new NoSuchElementException("해당 장소가 존재하지 않습니다: " + placeId);
                 });
-        return GetPlaceByIdResponseDto.fromEntity(place);
+
+
+        return GetPlaceByIdResponseDto.fromEntity(place, visited);
     }
 }

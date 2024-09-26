@@ -38,7 +38,8 @@ public class SecurityConfig {
             "/api/google-api/**",
             "/api/restaurants/**",
             "/api/baggage/**",
-            "/api/themes/**"
+            "/api/themes/{placeTheme}/places",
+            "/api/themes/places",
     };
     @Bean
     public PasswordEncoder passwordEncoder() {

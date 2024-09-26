@@ -116,8 +116,10 @@ public class GetPlaceByIdResponseDto {
     @JsonProperty("총 별점")
     private Integer totalRating;
 
+    private boolean visited; // 사용자의 방문 여부
+
     // Place 엔티티를 받아 필요한 필드만 초기화
-    public static GetPlaceByIdResponseDto fromEntity(Place place) {
+    public static GetPlaceByIdResponseDto fromEntity(Place place, Boolean visited) {
         return new GetPlaceByIdResponseDto(
                 place.getPlaceId(),
                 place.getTheme() != null ? place.getTheme().getThemeId() : null,
@@ -153,7 +155,8 @@ public class GetPlaceByIdResponseDto {
                 place.getHasSwimmingPool(),
                 place.getPriceRange(),
                 place.getRelatedLink(),
-                place.getTotalRating()
+                place.getTotalRating(),
+                visited
         );
     }
 }
