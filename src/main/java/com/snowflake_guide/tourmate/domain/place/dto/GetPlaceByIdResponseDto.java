@@ -117,9 +117,9 @@ public class GetPlaceByIdResponseDto {
     private Integer totalRating;
 
     private boolean visited; // 사용자의 방문 여부
-
+    private boolean likes;
     // Place 엔티티를 받아 필요한 필드만 초기화
-    public static GetPlaceByIdResponseDto fromEntity(Place place, Boolean visited) {
+    public static GetPlaceByIdResponseDto fromEntity(Place place, Boolean visited, Boolean likes) {
         return new GetPlaceByIdResponseDto(
                 place.getPlaceId(),
                 place.getTheme() != null ? place.getTheme().getThemeId() : null,
@@ -156,7 +156,8 @@ public class GetPlaceByIdResponseDto {
                 place.getPriceRange(),
                 place.getRelatedLink(),
                 place.getTotalRating(),
-                visited
+                visited,
+                likes
         );
     }
 }

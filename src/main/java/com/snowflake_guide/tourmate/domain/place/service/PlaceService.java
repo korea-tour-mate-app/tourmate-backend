@@ -1,5 +1,6 @@
 package com.snowflake_guide.tourmate.domain.place.service;
 
+import com.snowflake_guide.tourmate.domain.like.repository.LikeRepository;
 import com.snowflake_guide.tourmate.domain.member.entity.Member;
 import com.snowflake_guide.tourmate.domain.member.repository.MemberRepository;
 import com.snowflake_guide.tourmate.domain.place.dto.GetPlaceByIdResponseDto;
@@ -27,6 +28,7 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final VisitedPlaceRepository visitedPlaceRepository;
     private final MemberRepository memberRepository;
+    private final LikeRepository likeRepository;
     public GetPlacesByThemeResponseDto getPlacesByTheme(String placeTheme) {
 
         List<Place> places;
@@ -63,7 +65,9 @@ public class PlaceService {
     public GetPlaceByIdResponseDto getPlaceById(Long placeId, String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("멤버를 찾을 수 없습니다."));
+        Long memberId = member.getMemberId();
         boolean visited = visitedPlaceRepository.findByPlace_PlaceIdAndMember_Email(placeId, email).isPresent();
+        boolean likes = likeRepository.findByMember_MemberIdAndPlace_PlaceId(placeId, memberId).isPresent();
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> {
@@ -72,6 +76,6 @@ public class PlaceService {
                 });
 
 
-        return GetPlaceByIdResponseDto.fromEntity(place, visited);
+        return GetPlaceByIdResponseDto.fromEntity(place, visited, likes);
     }
 }
