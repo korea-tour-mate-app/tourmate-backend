@@ -2,9 +2,8 @@ name: Deploy
 
 on:
   push:
-    branches:
-      # - main
-
+    branches-ignore:
+      - '**' # 워크플로우 비활성화
 jobs:
   build:
     runs-on: ubuntu-latest
